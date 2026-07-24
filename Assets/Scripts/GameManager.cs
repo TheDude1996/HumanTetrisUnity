@@ -10,10 +10,19 @@ public class GameManager : MonoBehaviour
     public GameObject gameOverPanel;
 
     int score = 0;
+    bool gameOver = false;
 
     private void Awake()
     {
         Instance = this;
+    }
+
+    private void Update()
+    {
+        if (gameOver && Input.GetKeyDown(KeyCode.Space))
+        {
+            Restart();
+        }
     }
 
     public void AddScore(int lines)
@@ -31,12 +40,18 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
+        Debug.Log("GAME OVER WIRD AUSGEFÜHRT");
+
+        gameOver = true;
         gameOverPanel.SetActive(true);
+
         Time.timeScale = 0;
     }
 
     public void Restart()
     {
+        Debug.Log("NEUSTART");
+
         Time.timeScale = 1;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }

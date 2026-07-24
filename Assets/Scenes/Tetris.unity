@@ -124,17 +124,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4298829407311928744, guid: 6f20319b9f3be81499002204011a3d52, type: 3}
   m_PrefabInstance: {fileID: 2551894071176263668}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &501168487 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1128030000468121252, guid: e5a63f6e9a073584baa1b7dbc71cc021, type: 3}
-  m_PrefabInstance: {fileID: 2301987527873793120}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01b4b4c3797cf0d47950d99a0b43993a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!108 &705507994 stripped
 Light:
   m_CorrespondingSourceObject: {fileID: 4200169889630129731, guid: a9476582b55425d4bb8ca88d977def66, type: 3}
@@ -483,10 +472,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3591805570663799473, guid: 6f20319b9f3be81499002204011a3d52, type: 3}
-      propertyPath: m_Name
-      value: Restart Text
-      objectReference: {fileID: 0}
     - target: {fileID: 4298829407311928744, guid: 6f20319b9f3be81499002204011a3d52, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -498,34 +483,6 @@ PrefabInstance:
     - target: {fileID: 6177485728483571152, guid: 6f20319b9f3be81499002204011a3d52, type: 3}
       propertyPath: m_Name
       value: ScoreText
-      objectReference: {fileID: 0}
-    - target: {fileID: 8811863852838638884, guid: 6f20319b9f3be81499002204011a3d52, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8811863852838638884, guid: 6f20319b9f3be81499002204011a3d52, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8811863852838638884, guid: 6f20319b9f3be81499002204011a3d52, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 501168487}
-    - target: {fileID: 8811863852838638884, guid: 6f20319b9f3be81499002204011a3d52, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8811863852838638884, guid: 6f20319b9f3be81499002204011a3d52, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: Restart
-      objectReference: {fileID: 0}
-    - target: {fileID: 8811863852838638884, guid: 6f20319b9f3be81499002204011a3d52, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: GameManager, Assembly-CSharp
-      objectReference: {fileID: 0}
-    - target: {fileID: 8811863852838638884, guid: 6f20319b9f3be81499002204011a3d52, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -600,6 +557,22 @@ PrefabInstance:
     - target: {fileID: 1684256896410687304, guid: 06652014a5fafd44cb34a2b8187f363f, type: 3}
       propertyPath: m_Name
       value: Main Camera
+      objectReference: {fileID: 0}
+    - target: {fileID: 4429548245172391833, guid: 06652014a5fafd44cb34a2b8187f363f, type: 3}
+      propertyPath: m_ClearFlags
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4429548245172391833, guid: 06652014a5fafd44cb34a2b8187f363f, type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 0.6007476
+      objectReference: {fileID: 0}
+    - target: {fileID: 4429548245172391833, guid: 06652014a5fafd44cb34a2b8187f363f, type: 3}
+      propertyPath: m_BackGroundColor.g
+      value: 0.9404176
+      objectReference: {fileID: 0}
+    - target: {fileID: 4429548245172391833, guid: 06652014a5fafd44cb34a2b8187f363f, type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 0.9433962
       objectReference: {fileID: 0}
     - target: {fileID: 9033514587407301761, guid: 06652014a5fafd44cb34a2b8187f363f, type: 3}
       propertyPath: m_LocalPosition.x
