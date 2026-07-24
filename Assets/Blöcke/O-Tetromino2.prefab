@@ -439,7 +439,7 @@ GameObject:
   - component: {fileID: 7718234936656150520}
   - component: {fileID: -5502929811757104125}
   m_Layer: 0
-  m_Name: O-Tetromino
+  m_Name: O-Tetromino2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
