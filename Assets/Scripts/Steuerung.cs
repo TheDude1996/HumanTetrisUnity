@@ -138,14 +138,14 @@ public class Steuerung : MonoBehaviour
     // 1. Die Speicher-Funktion (fehlt noch in deinem Code)
     void AddToGrid()
     {
-        foreach (Transform child in transform)
+        foreach (Transform collisionBlock in transform)
         {
-            int x = Mathf.RoundToInt(child.position.x / 4);
-            int y = Mathf.RoundToInt(child.position.y / 4);
+            int x = Mathf.RoundToInt(collisionBlock.position.x / 4);
+            int y = Mathf.RoundToInt(collisionBlock.position.y / 4);
 
             if (x >= 0 && x < width && y >= 0 && y < height)
             {
-                grid[x, y] = child;
+                grid[x, y] = collisionBlock;
             }
         }
     }
@@ -153,10 +153,10 @@ public class Steuerung : MonoBehaviour
     // 2. Die Prüffunktion (muss das Grid abfragen!)
     bool ValidMove()
     {
-        foreach (Transform child in transform)
+        foreach (Transform collisionBlock in transform)
         {
-            int x = Mathf.RoundToInt(child.position.x / 4);
-            int y = Mathf.RoundToInt(child.position.y / 4);
+            int x = Mathf.RoundToInt(collisionBlock.position.x / 4);
+            int y = Mathf.RoundToInt(collisionBlock.position.y / 4);
 
             if (x < 0 || x >= width || y < 0 || y >= height)
                 return false;
