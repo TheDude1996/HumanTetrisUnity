@@ -13,13 +13,24 @@ public class Steuerung : MonoBehaviour
     public static int width = 11;
     public static int height = 40;
     public static Transform[,] grid = new Transform[width, height];
+    
+    // Ghost
+    public GameObject ghostPrefab;
+    public GameObject ghost;
 
+
+    public GameObject originalPrefab;
 
     void Start()
     {
         previousTime = Time.time;
 
-        if (!ValidMove())
+        fallTime = GameManager.Instance.GetFallTime();
+
+        ghost = Instantiate(ghostPrefab);
+        UpdateGhost();
+
+        if (!ValidMove(transform))
         {
             GameManager.Instance.GameOver();
         }
@@ -32,18 +43,42 @@ public class Steuerung : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             transform.position += new Vector3(4, 0, 0);
-            if (!ValidMove()) transform.position -= new Vector3(4, 0, 0);
+
+            if (!ValidMove(transform))
+            {
+                transform.position -= new Vector3(4, 0, 0);
+            }
+            else
+            {
+                UpdateGhost();
+            }
         }
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             transform.position += new Vector3(-4, 0, 0);
-            if (!ValidMove()) transform.position -= new Vector3(-4, 0, 0);
+
+            if (!ValidMove(transform))
+            {
+                transform.position -= new Vector3(-4, 0, 0);
+            }
+            else
+            {
+                UpdateGhost();
+            }
         }
         // --- Rotation ---
         else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
-            if (!ValidMove()) transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
+
+            if (!ValidMove(transform))
+            {
+                transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
+            }
+            else
+            {
+                UpdateGhost();
+            }
         }
 
         // --- Fallen ---
@@ -51,7 +86,7 @@ public class Steuerung : MonoBehaviour
         {
             transform.position += new Vector3(0, -4, 0);
 
-            if (!ValidMove())
+            if (!ValidMove(transform))
             {
                 // Kollision: Zurückbewegen
                 transform.position -= new Vector3(0, -4, 0);
@@ -63,14 +98,48 @@ public class Steuerung : MonoBehaviour
 
                 // Skript deaktivieren & neuen spawnen
                 this.enabled = false;
+                Destroy(ghost);
                 FindObjectsByType<SpawnTetromino>(FindObjectsSortMode.None)[0].NewTetromino();
             }
             else
             {
                 // Erfolgreich gefallen: Timer resetten
                 previousTime = Time.time;
+                UpdateGhost();
             }
         }
+
+        //Hard Drop
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            HardDrop();
+            return;
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            FindObjectsByType<SpawnTetromino>(FindObjectsSortMode.None)[0]
+                .HoldPiece(gameObject);
+
+            return;
+        }
+    }
+
+    void HardDrop()
+    {
+        transform.position = ghost.transform.position;
+
+        AddToGrid();
+
+        CheckforLines();
+
+        Destroy(ghost);
+
+        this.enabled = false;
+
+        FindObjectsByType<SpawnTetromino>(FindObjectsSortMode.None)[0].NewTetromino();
     }
 
     void CheckforLines()
@@ -151,9 +220,9 @@ public class Steuerung : MonoBehaviour
     }
 
     // 2. Die Prüffunktion (muss das Grid abfragen!)
-    bool ValidMove()
+    bool ValidMove(Transform piece)
     {
-        foreach (Transform collisionBlock in transform)
+        foreach (Transform collisionBlock in piece)
         {
             int x = Mathf.RoundToInt(collisionBlock.position.x / 4);
             int y = Mathf.RoundToInt(collisionBlock.position.y / 4);
@@ -167,4 +236,26 @@ public class Steuerung : MonoBehaviour
 
         return true;
     }
+
+    void UpdateGhost()
+    {
+        // Position und Rotation übernehmen
+        ghost.transform.position = transform.position;
+        ghost.transform.rotation = transform.rotation;
+
+        // So lange nach unten bewegen,
+        // bis der Ghost nicht mehr gültig ist
+        while (true)
+        {
+            ghost.transform.position += Vector3.down * 4;
+
+            if (!ValidMove(ghost.transform))
+            {
+                // Ein Feld zurück
+                ghost.transform.position += Vector3.up * 4;
+                break;
+            }
+        }
+    }
+
 }
