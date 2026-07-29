@@ -116,7 +116,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8833762150944769368}
-  - component: {fileID: 7322844479695870033}
+  - component: {fileID: 5437317241971511306}
   m_Layer: 0
   m_Name: J-Tetromino
   m_TagString: Untagged
@@ -133,7 +133,7 @@ Transform:
   m_GameObject: {fileID: 2742125183297726364}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 4, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -143,7 +143,7 @@ Transform:
   - {fileID: 7879599148945329708}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7322844479695870033
+--- !u!114 &5437317241971511306
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -152,7 +152,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2742125183297726364}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b8185511b6bb384fb8d5db1de230245, type: 3}
+  m_Script: {fileID: 11500000, guid: 6f51042bf22013d44bf645ad925476be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   rotationPoint: {x: 0, y: 0, z: 0}

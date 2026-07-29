@@ -39,6 +39,9 @@ public class Steuerung : MonoBehaviour
             transform.position += new Vector3(-4, 0, 0);
             if (!ValidMove()) transform.position -= new Vector3(-4, 0, 0);
         }
+
+
+
         // --- Rotation ---
         else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
