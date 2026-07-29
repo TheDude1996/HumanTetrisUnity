@@ -117,6 +117,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3436626322363952861}
   - component: {fileID: 1545698077694392917}
+  - component: {fileID: -3458337659553770964}
   m_Layer: 0
   m_Name: I-Tetromino
   m_TagString: Untagged
@@ -150,7 +151,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1631026640887998643}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8b8185511b6bb384fb8d5db1de230245, type: 3}
   m_Name: 
@@ -158,6 +159,23 @@ MonoBehaviour:
   rotationPoint: {x: 0, y: 8, z: 0}
   fallTime: 0.8
   ghostPrefab: {fileID: 1631026640887998643, guid: 3ad0a17e2c9b4bf4286436184faa5316, type: 3}
+  ghost: {fileID: 0}
+  originalPrefab: {fileID: 0}
+--- !u!114 &-3458337659553770964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1631026640887998643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f51042bf22013d44bf645ad925476be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotationPoint: {x: 0, y: 0, z: 0}
+  fallTime: 0.8
+  moveRepeatTime: 0.3
 --- !u!1 &2374147562629679228
 GameObject:
   m_ObjectHideFlags: 0
