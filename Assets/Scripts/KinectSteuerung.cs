@@ -8,7 +8,11 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
 {
     public Vector3 rotationPoint;
     private float previousTime;
-    public float fallTime = 0.8f;
+    public float fallTime = 1.2f;
+
+    // Ghost
+    public GameObject ghostPrefab;
+    public GameObject ghost;
 
     // Grid Definition
     public static int width = 11;
@@ -20,7 +24,7 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
     private bool moveLeftActive = false;
     private bool moveRightActive = false;
 
-    public float moveRepeatTime = 0.3f; // Wiederholrate für Links/Rechts, solange Hand oben ist
+    public float moveRepeatTime = 0.005f; // Wiederholrate für Links/Rechts, solange Hand oben ist
     private float previousMoveTime;
     void Start()
     {
@@ -28,6 +32,9 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
 
         // --- NEU: Sich selbst als Gesture-Listener beim KinectManager registrieren ---
         RegisterAsGestureListener();
+        
+        ghost = Instantiate(ghostPrefab);
+        UpdateGhost();
 
         if (!ValidMove(transform))
         {
@@ -42,14 +49,31 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
         {
             TryMove(new Vector3(4, 0, 0));
         }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+
+        else
+        {
+            UpdateGhost();
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             TryMove(new Vector3(-4, 0, 0));
         }
+
+        else
+        {
+            UpdateGhost();
+        }
+
         // --- Rotation (Tastatur) ---
-        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             TryRotate();
+        }
+        
+        else
+        {
+            UpdateGhost();
         }
 
         // --- Fallen ---
@@ -62,19 +86,38 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
             if (!ValidMove(transform))
             {
                 transform.position -= new Vector3(0, -4, 0);
+                if (hasDropped) return;
+                hasDropped = true;
+
                 AddToGrid();
                 CheckforLines();
-
-                // --- NEU: Sich selbst wieder als Gesture-Listener entfernen ---
-                UnregisterAsGestureListener();
+                Destroy(ghost);
 
                 this.enabled = false;
+                StartCoroutine(DeferredUnregister());
+
                 FindObjectsByType<SpawnTetromino>(FindObjectsSortMode.None)[0].NewTetromino();
             }
             else
             {
                 previousTime = Time.time;
             }
+        }
+        //Hard Drop
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            HardDrop();
+            return;
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            FindObjectsByType<SpawnTetromino>(FindObjectsSortMode.None)[0]
+                .HoldPiece(gameObject);
+
+            return;
         }
 
         // --- Kontinuierliches Verschieben, solange Hand-Geste aktiv ist ---
@@ -85,7 +128,26 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
             previousMoveTime = Time.time;
         }
     }
+    void UpdateGhost()
+    {
+        // Position und Rotation übernehmen
+        ghost.transform.position = transform.position;
+        ghost.transform.rotation = transform.rotation;
 
+        // So lange nach unten bewegen,
+        // bis der Ghost nicht mehr gültig ist
+        while (true)
+        {
+            ghost.transform.position += Vector3.down * 4;
+
+            if (!ValidMove(ghost.transform))
+            {
+                // Ein Feld zurück
+                ghost.transform.position += Vector3.up * 4;
+                break;
+            }
+        }
+    }
     // --- Hilfsfunktionen für Bewegung/Rotation ---
     void TryMove(Vector3 delta)
     {
@@ -97,6 +159,36 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
     {
         transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
         if (!ValidMove(transform)) transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
+    }
+
+    private bool hasDropped = false;
+
+    void HardDrop()
+    {
+        if (hasDropped) return;
+        hasDropped = true;
+
+        transform.position = ghost.transform.position;
+
+        AddToGrid();
+        CheckforLines();
+        Destroy(ghost);
+
+        this.enabled = false;
+
+        // NICHT synchron abmelden -> verschieben, damit die
+        // laufende foreach-Schleife im KinectManager nicht
+        // während der Iteration verändert wird
+        StartCoroutine(DeferredUnregister());
+
+        FindObjectsByType<SpawnTetromino>(FindObjectsSortMode.None)[0].NewTetromino();
+    }
+
+    private IEnumerator DeferredUnregister()
+    {
+        // einen Frame warten, bis KinectManager.Update() fertig ist
+        yield return null;
+        UnregisterAsGestureListener();
     }
 
     // =========================================================
@@ -139,8 +231,9 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
 
         manager.DetectGesture(userId, KinectGestures.Gestures.RaiseLeftHand);
         manager.DetectGesture(userId, KinectGestures.Gestures.RaiseRightHand);
-        manager.DetectGesture(userId, KinectGestures.Gestures.Squat);
-        manager.DetectGesture(userId, KinectGestures.Gestures.Wave); // -> Drehen
+        manager.DetectGesture(userId, KinectGestures.Gestures.Squat);   // => Drehen
+        manager.DetectGesture(userId, KinectGestures.Gestures.Jump);    // frei
+        
     }
 
     public void UserLost(uint userId, int userIndex)
@@ -179,14 +272,19 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
                 moveLeftActive = true;
                 break;
 
-            case KinectGestures.Gestures.Wave:
+            case KinectGestures.Gestures.Squat:
                 TryRotate();
                 break;
 
-            case KinectGestures.Gestures.Squat:
-                squatActive = true;
-                StartCoroutine(ResetSquatAfterDelay());
-                break;
+            //case KinectGestures.Gestures.Squat:
+              //  squatActive = true;
+                //StartCoroutine(ResetSquatAfterDelay());
+                //break;
+
+            //case KinectGestures.Gestures.Squat:
+              //   HardDrop();
+                // break; 
+
         }
 
         return true; // Gestenerkennung sofort neu starten
@@ -217,7 +315,7 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
     }
     private IEnumerator ResetSquatAfterDelay()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.4f);
         squatActive = false;
     }
 

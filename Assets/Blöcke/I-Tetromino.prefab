@@ -175,6 +175,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationPoint: {x: 0, y: 0, z: 0}
   fallTime: 0.8
+  ghostPrefab: {fileID: 1631026640887998643, guid: 3ad0a17e2c9b4bf4286436184faa5316, type: 3}
+  ghost: {fileID: 0}
   moveRepeatTime: 0.3
 --- !u!1 &2374147562629679228
 GameObject:

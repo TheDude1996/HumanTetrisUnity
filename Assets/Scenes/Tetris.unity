@@ -173,7 +173,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 759579411363219063, guid: be1f154a1bed3d1488b0b4eff243ebbe, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4012970854649530466, guid: be1f154a1bed3d1488b0b4eff243ebbe, type: 3}
       propertyPath: wavFileName
@@ -680,8 +680,20 @@ PrefabInstance:
       value: Main Camera (1)
       objectReference: {fileID: 0}
     - target: {fileID: 1568548674359835630, guid: 51d25ffe493b97d4d9dc6da7a88e6957, type: 3}
+      propertyPath: SensorAngle
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1568548674359835630, guid: 51d25ffe493b97d4d9dc6da7a88e6957, type: 3}
+      propertyPath: SensorHeight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1568548674359835630, guid: 51d25ffe493b97d4d9dc6da7a88e6957, type: 3}
+      propertyPath: MinTimeBetweenGestures
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 1568548674359835630, guid: 51d25ffe493b97d4d9dc6da7a88e6957, type: 3}
       propertyPath: Player1Gestures.Array.size
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1568548674359835630, guid: 51d25ffe493b97d4d9dc6da7a88e6957, type: 3}
       propertyPath: 'Player1Gestures.Array.data[0]'
@@ -697,7 +709,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1568548674359835630, guid: 51d25ffe493b97d4d9dc6da7a88e6957, type: 3}
       propertyPath: 'Player1Gestures.Array.data[3]'
-      value: 6
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1568548674359835630, guid: 51d25ffe493b97d4d9dc6da7a88e6957, type: 3}
+      propertyPath: 'Player1Gestures.Array.data[4]'
+      value: 17
       objectReference: {fileID: 0}
     - target: {fileID: 3344073716888506692, guid: 51d25ffe493b97d4d9dc6da7a88e6957, type: 3}
       propertyPath: m_LocalPosition.x
@@ -709,7 +725,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3344073716888506692, guid: 51d25ffe493b97d4d9dc6da7a88e6957, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -50
+      value: -45
       objectReference: {fileID: 0}
     - target: {fileID: 3344073716888506692, guid: 51d25ffe493b97d4d9dc6da7a88e6957, type: 3}
       propertyPath: m_LocalRotation.w
@@ -737,6 +753,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3344073716888506692, guid: 51d25ffe493b97d4d9dc6da7a88e6957, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4478708830039360515, guid: 51d25ffe493b97d4d9dc6da7a88e6957, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

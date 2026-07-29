@@ -756,9 +756,9 @@ public class KinectManager : MonoBehaviour
 	{
 		if(Player1Avatars.Count == 0 && Player2Avatars.Count == 0)
 		{
-			AvatarController[] avatars = FindObjectsOfType(typeof(AvatarController)) as AvatarController[];
-			
-			foreach(AvatarController avatar in avatars)
+            AvatarController[] avatars = FindObjectsByType<AvatarController>(FindObjectsSortMode.None);
+
+            foreach (AvatarController avatar in avatars)
 			{
 				Player1Avatars.Add(avatar.gameObject);
 			}
@@ -995,7 +995,7 @@ public class KinectManager : MonoBehaviour
 			kinectToWorld.SetTRS(new Vector3(0.0f, SensorHeight, 0.0f), quatTiltAngle, Vector3.one);
 			flipMatrix = Matrix4x4.identity;
 			flipMatrix[2, 2] = -1;
-			
+
 			instance = this;
 			DontDestroyOnLoad(gameObject);
 		}
@@ -1044,9 +1044,8 @@ public class KinectManager : MonoBehaviour
 		// try to automatically find the available avatar controllers in the scene
 		if(Player1Avatars.Count == 0 && Player2Avatars.Count == 0)
 		{
-			AvatarController[] avatars = FindObjectsOfType(typeof(AvatarController)) as AvatarController[];
-			
-			foreach(AvatarController avatar in avatars)
+            AvatarController[] avatars = FindObjectsByType<AvatarController>(FindObjectsSortMode.None);
+            foreach (AvatarController avatar in avatars)
 			{
 				Player1Avatars.Add(avatar.gameObject);
 			}

@@ -940,7 +940,7 @@ public class KinectGestures
 							(jointsPos[hipCenterIndex].y > 0.9f) && (jointsPos[hipCenterIndex].y < 1.3f))
 						{
 							SetGestureJoint(ref gestureData, timestamp, hipCenterIndex, jointsPos[hipCenterIndex]);
-							gestureData.progress = 0.5f;
+							gestureData.progress = 0.3f;
 						}
 						break;
 				
