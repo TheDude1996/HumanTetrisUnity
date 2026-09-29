@@ -8,11 +8,14 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
 {
     public Vector3 rotationPoint;
     private float previousTime;
-    public float fallTime = 1.2f;
-
+    public float fallTime = 0.8f;
+    
     // Ghost
     public GameObject ghostPrefab;
     public GameObject ghost;
+
+
+    public GameObject originalPrefab;
 
     // Grid Definition
     public static int width = 11;
@@ -29,6 +32,8 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
     void Start()
     {
         previousTime = Time.time;
+
+        fallTime = GameManager.Instance.GetFallTime();
 
         // --- NEU: Sich selbst als Gesture-Listener beim KinectManager registrieren ---
         RegisterAsGestureListener();

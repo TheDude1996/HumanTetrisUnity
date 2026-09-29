@@ -45,7 +45,7 @@ public class NextPiecePreview : MonoBehaviour
             currentPreviews.Add(preview);
 
             // Steuerung deaktivieren
-            Steuerung control = preview.GetComponent<Steuerung>();
+            KinectSteuerung control = preview.GetComponent<KinectSteuerung>();
             if (control != null)
                 control.enabled = false;
 

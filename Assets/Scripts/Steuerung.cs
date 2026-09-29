@@ -91,7 +91,7 @@ public class Steuerung : MonoBehaviour
                 // Kollision: Zurückbewegen
                 transform.position -= new Vector3(0, -4, 0);
 
-                // WICHTIG: Block ins Grid eintragen
+                // Block ins Grid eintragen
                 AddToGrid();
 
                 CheckforLines();
@@ -117,6 +117,7 @@ public class Steuerung : MonoBehaviour
             return;
         }
 
+        // Hold
 
         if (Input.GetKeyDown(KeyCode.C))
         {
@@ -203,8 +204,6 @@ public class Steuerung : MonoBehaviour
         }
     }
 
-
-    // 1. Die Speicher-Funktion (fehlt noch in deinem Code)
     void AddToGrid()
     {
         foreach (Transform collisionBlock in transform)
@@ -219,7 +218,6 @@ public class Steuerung : MonoBehaviour
         }
     }
 
-    // 2. Die Prüffunktion (muss das Grid abfragen!)
     bool ValidMove(Transform piece)
     {
         foreach (Transform collisionBlock in piece)

@@ -46,7 +46,7 @@ public class SpawnTetromino : MonoBehaviour
 
         GameObject piece = Instantiate(nextPiece, transform.position, Quaternion.identity);
 
-        piece.GetComponent<Steuerung>().originalPrefab = nextPiece;
+        piece.GetComponent<KinectSteuerung>().originalPrefab = nextPiece;
 
         AddRandomPiece();
 
@@ -63,7 +63,7 @@ public class SpawnTetromino : MonoBehaviour
             Quaternion.identity
         );
 
-        piece.GetComponent<Steuerung>().originalPrefab = piecePrefab;
+        piece.GetComponent<KinectSteuerung>().originalPrefab = piecePrefab;
 
         canHold = false;
     }
@@ -74,7 +74,7 @@ public class SpawnTetromino : MonoBehaviour
             return;
 
 
-        Steuerung steuerung = currentPiece.GetComponent<Steuerung>();
+        KinectSteuerung steuerung = currentPiece.GetComponent<KinectSteuerung>();
 
 
         if (steuerung.ghost != null)

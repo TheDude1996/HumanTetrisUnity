@@ -280,10 +280,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f51042bf22013d44bf645ad925476be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationPoint: {x: 0, y: 0, z: 0}
+  rotationPoint: {x: 2, y: 2, z: 0}
   fallTime: 0.8
   ghostPrefab: {fileID: 7206552604750207460, guid: 909b0aa419426b242ab717d04bc7352a, type: 3}
   ghost: {fileID: 0}
+  originalPrefab: {fileID: 0}
   moveRepeatTime: 0.3
 --- !u!1 &8364698376139424282
 GameObject:

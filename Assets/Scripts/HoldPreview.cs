@@ -23,10 +23,10 @@ public class HoldPreview : MonoBehaviour
             transform.position,
             Quaternion.identity
         );
-
+        
 
         // Steuerung entfernen
-        Steuerung steuerung = currentHoldPreview.GetComponent<Steuerung>();
+        KinectSteuerung steuerung = currentHoldPreview.GetComponent<KinectSteuerung>();
 
         if (steuerung != null)
         {
