@@ -4,5 +4,15 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: e0350c43ab698e14b8c4dd9099d72820
+  - enabled: 1
+    path: Assets/Scenes/Tetris.unity
+    guid: c3f40e8a2de6e5142ab10ec0cf6373cc
+  - enabled: 1
+    path: Assets/Scenes/GameOverMenu.unity
+    guid: 204f14efc2a70b24c91082192572060d
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0

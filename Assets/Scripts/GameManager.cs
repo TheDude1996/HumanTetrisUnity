@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
 
     public TMP_Text scoreText;
     public TMP_Text levelText;      // Neu
-    public GameObject gameOverPanel;
+    //public GameObject gameOverPanel;
 
     private int score = 0;
     private bool gameOver = false;
@@ -79,14 +79,20 @@ public class GameManager : MonoBehaviour
         return fallTimes[index];
     }
 
+    //public void GameOver()
+    //{
+    //    Debug.Log("GAME OVER WIRD AUSGEFÜHRT");
+
+    //    gameOver = true;
+    //    gameOverPanel.SetActive(true);
+
+    //    Time.timeScale = 0;
+    //}
+
     public void GameOver()
     {
-        Debug.Log("GAME OVER WIRD AUSGEFÜHRT");
-
         gameOver = true;
-        gameOverPanel.SetActive(true);
-
-        Time.timeScale = 0;
+        SceneManager.LoadScene(2);
     }
 
     public void Restart()
@@ -94,6 +100,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("NEUSTART");
 
         Time.timeScale = 1;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene(1);
     }
 }
