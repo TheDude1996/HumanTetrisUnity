@@ -45,4 +45,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scoreText: {fileID: 0}
-  gameOverPanel: {fileID: 0}
+  levelText: {fileID: 0}
+  level: 1
+  totalLines: 0

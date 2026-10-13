@@ -37,7 +37,7 @@ public class KinectManager : MonoBehaviour
 	
 	// Public Float to specify the image width used by depth and color maps, as % of the camera width. the height is calculated depending on the width.
 	// if percent is zero, it is calculated internally to match the selected width and height of the depth image
-	public float DisplayMapsWidthPercent = 20f;
+	private float DisplayMapsWidthPercent = 30f;
 
 	// How high off the ground is the sensor (in meters).
 	public float SensorHeight = 1.0f;
@@ -79,7 +79,7 @@ public class KinectManager : MonoBehaviour
 	public List<KinectGestures.Gestures> Player2Gestures;
 	
 	// Minimum time between gesture detections
-	public float MinTimeBetweenGestures = 0.7f;
+	private float MinTimeBetweenGestures = 0.3f;
 	
 	// List of Gesture Listeners. They must implement KinectGestures.GestureListenerInterface
 	public List<MonoBehaviour> GestureListeners;

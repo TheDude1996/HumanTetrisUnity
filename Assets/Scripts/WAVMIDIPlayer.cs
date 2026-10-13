@@ -1,8 +1,9 @@
-using UnityEngine;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using System.Collections;
 using System.IO;
+using UnityEngine;
+using static UnityEngine.Timeline.AnimationPlayableAsset;
 
 public class MidiWavPlayer : MonoBehaviour
 {
@@ -10,8 +11,15 @@ public class MidiWavPlayer : MonoBehaviour
     public string midiFileName = "";
     public string wavFileName = "";
 
+    //[Header("MIDI Geschwindigkeit")]
+    //[Range(0.25f, 2f)]
+    private float midiSpeed = 1f;
+
     [Header("Referenzen")]
     public AudioSource audioSource;
+
+    [Header("Loop Einstellungen")]
+    public bool loopMidi = true;
 
     private MidiFile midiFile;
     private AudioClip sampleClip;
@@ -117,21 +125,58 @@ public class MidiWavPlayer : MonoBehaviour
 
     void PlayMidiWithSample()
     {
-        if (midiFile == null || sampleClip == null) return;
+        if (midiFile == null || sampleClip == null)
+            return;
 
-        var notes = midiFile.GetNotes();
-        foreach (var note in notes)
-        {
-            StartCoroutine(PlayNoteAtTime(note, sampleClip));
-        }
+        StartCoroutine(PlayMidiLoop());
     }
 
+    IEnumerator PlayMidiLoop()
+    {
+        var notes = midiFile.GetNotes();
+        var tempoMap = midiFile.GetTempoMap();
+
+        // Gesamtdauer der MIDI-Datei ermitteln
+        float midiDuration = 0f;
+
+        foreach (var note in notes)
+        {
+            float noteEnd = (float)TimeConverter
+                .ConvertTo<MetricTimeSpan>(note.EndTime, tempoMap)
+                .TotalSeconds;
+
+            if (noteEnd > midiDuration)
+                midiDuration = noteEnd;
+        }
+
+        do
+        {
+            // Alle Noten für diesen Durchlauf starten
+            foreach (var note in notes)
+            {
+                StartCoroutine(PlayNoteAtTime(note, sampleClip));
+            }
+
+            // Bis zum Ende der MIDI-Datei warten
+            yield return new WaitForSeconds(
+                midiDuration / Mathf.Max(0.01f, midiSpeed)
+            );
+
+        } while (loopMidi);
+    }
     IEnumerator PlayNoteAtTime(Note note, AudioClip clip)
     {
-        float startTime = (float)note.TimeAs<MetricTimeSpan>(midiFile.GetTempoMap()).TotalSeconds;
+        float startTime = (float)note.TimeAs<MetricTimeSpan>(
+            midiFile.GetTempoMap()
+        ).TotalSeconds;
+
+        // Geschwindigkeit berücksichtigen
+        startTime /= Mathf.Max(0.01f, midiSpeed);
+
         yield return new WaitForSeconds(startTime);
 
         float pitch = GetPitchFromMidiNumber(note.NoteNumber);
+
         if (pitch > 0)
         {
             audioSource.pitch = pitch;

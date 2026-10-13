@@ -173,15 +173,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 759579411363219063, guid: be1f154a1bed3d1488b0b4eff243ebbe, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4012970854649530466, guid: be1f154a1bed3d1488b0b4eff243ebbe, type: 3}
+      propertyPath: loopMidi
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4012970854649530466, guid: be1f154a1bed3d1488b0b4eff243ebbe, type: 3}
+      propertyPath: midiSpeed
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4012970854649530466, guid: be1f154a1bed3d1488b0b4eff243ebbe, type: 3}
       propertyPath: wavFileName
-      value: pianoc4.wav
+      value: kinect_sample.wav
       objectReference: {fileID: 0}
     - target: {fileID: 4012970854649530466, guid: be1f154a1bed3d1488b0b4eff243ebbe, type: 3}
       propertyPath: midiFileName
       value: Tetris Main Theme.mid
+      objectReference: {fileID: 0}
+    - target: {fileID: 7938483725510317847, guid: be1f154a1bed3d1488b0b4eff243ebbe, type: 3}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -600,11 +612,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1365797361 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4298829407311928744, guid: 6f20319b9f3be81499002204011a3d52, type: 3}
-  m_PrefabInstance: {fileID: 1986304712}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1439855179
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -863,10 +870,6 @@ PrefabInstance:
       propertyPath: scoreText
       value: 
       objectReference: {fileID: 966617909}
-    - target: {fileID: 1128030000468121252, guid: e5a63f6e9a073584baa1b7dbc71cc021, type: 3}
-      propertyPath: gameOverPanel
-      value: 
-      objectReference: {fileID: 1365797361}
     - target: {fileID: 3144468859589772252, guid: e5a63f6e9a073584baa1b7dbc71cc021, type: 3}
       propertyPath: m_LocalPosition.x
       value: 607.01385
@@ -911,10 +914,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameManager
       objectReference: {fileID: 0}
-    - target: {fileID: 4352338962974973330, guid: e5a63f6e9a073584baa1b7dbc71cc021, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -931,6 +930,10 @@ PrefabInstance:
     - target: {fileID: 1019161642374581423, guid: 23d123cc1386ea048bdd64b97dc93b1a, type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1019161642374581423, guid: 23d123cc1386ea048bdd64b97dc93b1a, type: 3}
+      propertyPath: 'Player1Gestures.Array.data[3]'
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 6161546901765205973, guid: 23d123cc1386ea048bdd64b97dc93b1a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -972,6 +975,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7653459628283759874, guid: 23d123cc1386ea048bdd64b97dc93b1a, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8142451839438193230, guid: 23d123cc1386ea048bdd64b97dc93b1a, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -991,8 +998,8 @@ SceneRoots:
   m_Roots:
   - {fileID: 818960843}
   - {fileID: 1439855179}
-  - {fileID: 2301987527873793120}
   - {fileID: 1533713330}
+  - {fileID: 2301987527873793120}
   - {fileID: 609790124}
   - {fileID: 29742378}
   - {fileID: 456775097}
