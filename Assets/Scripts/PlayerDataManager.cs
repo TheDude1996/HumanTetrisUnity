@@ -31,7 +31,7 @@ public class PlayerDataManager : MonoBehaviour
         [Tooltip("Optional: fester Dateiname des Kopf-Scans. Leer = die erste .glb im Spieler-Ordner")]
         public string headFileName = "";
         [Tooltip("Größe des Kopfes im Block (Anteil der Blockgröße, 1 = füllt den Block)")]
-        public float headSize = 0.8f;
+        public float headSize = 0.95f; // 1.0 = Gesicht berührt die Glasfläche (Pipeline normiert die Kopftiefe)
         [Tooltip("Zusätzliche Drehung des Kopfes in Grad (falls die Scans in eine andere Richtung schauen)")]
         public Vector3 headRotation = new Vector3(0, 180, 0); // Blender-Export der Pipeline schaut nach +Z, Kamera schaut aus -Z
         [Tooltip("Helligkeit der Kopf-Textur (1 = Original, 1.5 = 50 % heller)")]
