@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
+    public static int LastScore, LastLevel, LastLines; // Ergebnis der letzten Runde (Game-Over-Screen)
 
     public TMP_Text scoreText;
     public TMP_Text levelText;      // Neu
@@ -109,6 +110,7 @@ public class GameManager : MonoBehaviour
         gameOver = true;
 
         // Runde im Ordner des Spielers und in der globalen Bestenliste sichern (Netzwerk, im Hintergrund)
+        LastScore = score; LastLevel = level; LastLines = totalLines;
         PlayerDataManager.Instance.SaveRound(score, level, totalLines);
 
         SceneManager.LoadScene(2);
