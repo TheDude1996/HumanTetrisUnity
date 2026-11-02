@@ -104,3 +104,12 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# Rechnerspezifische Konfiguration (Pfad zum Scan-Netzwerkordner), wird beim ersten Start angelegt
+/HumanTetris_config.json
+
+# Vom Spiel erzeugte Dateien im Scan-Ordner (Highscores, Aufnahmen) nicht einchecken
+/Scans/leaderboard.json
+/Scans/**/highscore.json
+/Scans/**/sample.wav
+/Scans/**/*.tmp

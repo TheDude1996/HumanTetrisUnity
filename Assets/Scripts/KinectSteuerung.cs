@@ -19,7 +19,7 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
 
     // Grid Definition
     public static int width = 11;
-    public static int height = 40;
+    public static int height = 20;
     public static Transform[,] grid = new Transform[width, height];
 
     // --- Kinect ---
@@ -38,6 +38,12 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
 
         // --- NEU: Sich selbst als Gesture-Listener beim KinectManager registrieren ---
         RegisterAsGestureListener();
+
+        // Ragt der Stein oben aus dem Feld (z. B. das senkrechte I), nach unten schieben
+        while (TopRow() >= height)
+        {
+            transform.position += Vector3.down * 4;
+        }
 
         ghost = Instantiate(ghostPrefab);
         UpdateGhost();
@@ -107,6 +113,9 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
             else
             {
                 previousTime = Time.time;
+
+                // Soft Drop: 1 Punkt pro Reihe, die durch ↓ schneller gefallen ist
+                if (schnellFallen) GameManager.Instance.AddDropScore(1);
             }
         }
         //Hard Drop
@@ -166,6 +175,9 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
                 break;
             }
         }
+
+        // Liegt der Ghost genau auf dem Stein, würde er ihn nur blass überdecken
+        ghost.SetActive(ghost.transform.position != transform.position);
     }
     // --- Hilfsfunktionen für Bewegung/Rotation ---
     void TryMove(Vector3 delta)
@@ -174,10 +186,33 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
         if (!ValidMove(transform)) transform.position -= delta;
     }
 
+    // Wall Kicks: Passt die Drehung an Ort und Stelle nicht (Rand, Boden oder andere Steine im Weg),
+    // werden nacheinander kleine Verschiebungen probiert (in Feldern). Die erste gültige wird genommen.
+    // Reihenfolge: seitlich 1, hoch 1 (Drehen am Boden), schräg hoch, seitlich 2 (vor allem für das I).
+    private static readonly Vector2Int[] wallKicks =
+    {
+        new Vector2Int(0, 0),
+        new Vector2Int(-1, 0), new Vector2Int(1, 0),
+        new Vector2Int(0, 1),
+        new Vector2Int(-1, 1), new Vector2Int(1, 1),
+        new Vector2Int(-2, 0), new Vector2Int(2, 0),
+    };
+
     void TryRotate()
     {
-        transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
-        if (!ValidMove(transform)) transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
+        Vector3 pivot = transform.TransformPoint(rotationPoint);
+        transform.RotateAround(pivot, Vector3.forward, 90);
+
+        foreach (Vector2Int kick in wallKicks)
+        {
+            Vector3 offset = new Vector3(kick.x * 4, kick.y * 4, 0);
+            transform.position += offset;
+            if (ValidMove(transform)) return;
+            transform.position -= offset;
+        }
+
+        // Keine Position passt -> Drehung zurücknehmen
+        transform.RotateAround(pivot, Vector3.forward, -90);
     }
 
     private bool hasDropped = false;
@@ -186,6 +221,10 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
     {
         if (hasDropped) return;
         hasDropped = true;
+
+        // Hard Drop: 2 Punkte pro übersprungener Reihe
+        int rows = Mathf.RoundToInt((transform.position.y - ghost.transform.position.y) / 4);
+        if (rows > 0) GameManager.Instance.AddDropScore(rows * 2);
 
         transform.position = ghost.transform.position;
 
@@ -427,6 +466,16 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
                 grid[x, y] = collisionBlock;
             }
         }
+    }
+
+    int TopRow()
+    {
+        int top = int.MinValue;
+        foreach (Transform collisionBlock in transform)
+        {
+            top = Mathf.Max(top, Mathf.RoundToInt(collisionBlock.position.y / 4));
+        }
+        return top;
     }
 
     bool ValidMove(Transform piece)

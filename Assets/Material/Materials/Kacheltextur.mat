@@ -17,7 +17,7 @@ Material:
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
+  m_CustomRenderQueue: 2900
   stringTagMap:
     RenderType: Transparent
   disabledShaderPasses: []
@@ -47,7 +47,7 @@ Material:
         m_Offset: {x: 0.28, y: 0.18}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: 3306e61675cca92449c3f9ca850511d8, type: 3}
-        m_Scale: {x: 12.3, y: 46}
+        m_Scale: {x: 12.3, y: 23}
         m_Offset: {x: 0.28, y: 0.18}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}

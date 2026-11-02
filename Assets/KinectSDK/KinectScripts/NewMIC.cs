@@ -50,8 +50,13 @@ public class KinectMicRecorder : MonoBehaviour
                 string saveDir = Application.isEditor
                     ? Application.streamingAssetsPath
                     : Application.persistentDataPath;
-                SaveWav(_clip, Path.Combine(saveDir, "kinect_sample.wav"));
+                string localPath = Path.Combine(saveDir, "kinect_sample.wav");
+                SaveWav(_clip, localPath);
                 Debug.Log("Saved!");
+
+                // Zusätzlich in den Ordner des gewählten Spielers im Netzwerk sichern (sample.wav);
+                // der MidiWavPlayer bevorzugt diese Aufnahme
+                PlayerDataManager.Instance.SaveSample(File.ReadAllBytes(localPath));
             }
         }
     }

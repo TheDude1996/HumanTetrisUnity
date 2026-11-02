@@ -50,7 +50,7 @@ public class NextPiecePreview : MonoBehaviour
                 control.enabled = false;
 
             // Etwas kleiner darstellen
-            preview.transform.localScale = Vector3.one * 0.5f;
+            preview.transform.localScale = Vector3.one * 0.75f;
         }
     }
 }

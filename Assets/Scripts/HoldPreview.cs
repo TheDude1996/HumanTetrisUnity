@@ -45,6 +45,6 @@ public class HoldPreview : MonoBehaviour
 
 
         // kleiner machen
-        currentHoldPreview.transform.localScale = Vector3.one * 0.5f;
+        currentHoldPreview.transform.localScale = Vector3.one * 0.75f;
     }
 }

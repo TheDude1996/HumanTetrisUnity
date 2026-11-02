@@ -35,22 +35,36 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    [Tooltip("Nach wie vielen gelöschten Linien das Level steigt")]
+    public int linesPerLevel = 10;
+
+    // Grundpunkte für 1/2/3/4 Linien auf einmal (klassisch), werden mit dem Level multipliziert
+    private static readonly int[] lineScores = { 0, 100, 300, 500, 800 };
+
     public void AddScore(int lines)
     {
-        // Punkte vergeben
-        switch (lines)
-        {
-            case 1: score += 100; break;
-            case 2: score += 300; break;
-            case 3: score += 500; break;
-            case 4: score += 800; break;
-        }
+        if (lines <= 0) return;
+
+        // Punkte vergeben: Grundpunkte × aktuelles Level (Level vor einem möglichen Aufstieg)
+        score += lineScores[Mathf.Min(lines, 4)] * level;
 
         // Linien und Level aktualisieren
         totalLines += lines;
-        level = totalLines / 10 + 1;
+        level = totalLines / Mathf.Max(1, linesPerLevel) + 1;
 
-        // UI aktualisieren
+        UpdateUI();
+    }
+
+    // Punkte für Soft Drop (1 pro Reihe) und Hard Drop (2 pro Reihe)
+    public void AddDropScore(int points)
+    {
+        if (points <= 0) return;
+        score += points;
+        UpdateUI();
+    }
+
+    private void UpdateUI()
+    {
         scoreText.text = "Score: " + score;
         levelText.text = "Level: " + level;
     }
@@ -91,7 +105,12 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
+        if (gameOver) return; // nur einmal pro Runde speichern
         gameOver = true;
+
+        // Runde im Ordner des Spielers und in der globalen Bestenliste sichern (Netzwerk, im Hintergrund)
+        PlayerDataManager.Instance.SaveRound(score, level, totalLines);
+
         SceneManager.LoadScene(2);
     }
 
