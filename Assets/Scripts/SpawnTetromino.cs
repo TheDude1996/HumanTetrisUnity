@@ -77,6 +77,10 @@ public class SpawnTetromino : MonoBehaviour
         KinectSteuerung steuerung = currentPiece.GetComponent<KinectSteuerung>();
 
 
+        // Sofort deaktivieren: Destroy greift erst am Frame-Ende, bis dahin soll der Stein
+        // keine Gesten/Eingaben mehr verarbeiten
+        steuerung.enabled = false;
+
         if (steuerung.ghost != null)
         {
             Destroy(steuerung.ghost);
@@ -93,9 +97,10 @@ public class SpawnTetromino : MonoBehaviour
 
             Destroy(currentPiece);
 
-            canHold = false;
-
             NewTetromino();
+
+            // Erst NACH NewTetromino sperren, weil NewTetromino canHold wieder auf true setzt
+            canHold = false;
         }
 
 

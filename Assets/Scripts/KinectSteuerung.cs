@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
 
@@ -278,6 +277,9 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
     public bool GestureCompleted(uint userId, int userIndex, KinectGestures.Gestures gesture,
                                   KinectWrapper.NuiSkeletonPositionIndex joint, Vector3 screenPos)
     {
+        // Gelandeter oder gerade gehaltener Stein ist bis zum Abmelden noch registriert -> ignorieren
+        if (!enabled || hasDropped) return true;
+
         switch (gesture)
         {
             // --- Einmalige Bewegung ---
