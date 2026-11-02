@@ -23,8 +23,8 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        scoreText.text = "Score: " + score;
-        levelText.text = "Level: " + level;
+        scoreText.text = "<size=40%><color=#A4A8C2>SCORE</color></size>\n" + score;
+        levelText.text = "<size=40%><color=#A4A8C2>LEVEL</color></size>\n" + level;
     }
 
     private void Update()
@@ -65,8 +65,8 @@ public class GameManager : MonoBehaviour
 
     private void UpdateUI()
     {
-        scoreText.text = "Score: " + score;
-        levelText.text = "Level: " + level;
+        scoreText.text = "<size=40%><color=#A4A8C2>SCORE</color></size>\n" + score;
+        levelText.text = "<size=40%><color=#A4A8C2>LEVEL</color></size>\n" + level;
     }
 
     private readonly float[] fallTimes =

@@ -224,9 +224,11 @@ public class PlayerDataManager : MonoBehaviour
 
     // ---------------- Kopf laden (GLB über glTFast) ----------------
 
-    public string FindHeadFile()
+    public string FindHeadFile() => FindHeadFile(SelectedPlayer);
+
+    public string FindHeadFile(string player)
     {
-        string folder = SelectedFolder;
+        string folder = string.IsNullOrEmpty(player) ? null : Path.Combine(ScansRoot, player);
         if (folder == null || !Directory.Exists(folder)) return null;
 
         if (!string.IsNullOrEmpty(config.headFileName))
@@ -300,11 +302,13 @@ public class PlayerDataManager : MonoBehaviour
     private static readonly int EmissiveFactor = Shader.PropertyToID("emissiveFactor");
     private static readonly int EmissiveTexture = Shader.PropertyToID("emissiveTexture");
 
-    public void ApplyHeadLook()
-    {
-        if (HeadTemplate == null) return;
+    public void ApplyHeadLook() => ApplyHeadLook(HeadTemplate);
 
-        foreach (var r in HeadTemplate.GetComponentsInChildren<Renderer>(true))
+    public void ApplyHeadLook(GameObject template)
+    {
+        if (template == null) return;
+
+        foreach (var r in template.GetComponentsInChildren<Renderer>(true))
         {
             foreach (var m in r.sharedMaterials)
             {
@@ -337,6 +341,52 @@ public class PlayerDataManager : MonoBehaviour
         }
     }
 
+    // Ein zusätzlich geladener Kopf (unabhängig vom gewählten Spieler), siehe LoadHeadAssetAsync
+    public class HeadAsset
+    {
+        public string Player;
+        public GameObject Template;
+        public GLTFast.GltfImport Import;
+
+        public void Dispose()
+        {
+            if (Template != null) UnityEngine.Object.Destroy(Template);
+            Template = null;
+            Import?.Dispose();
+            Import = null;
+        }
+    }
+
+    // Lädt den Kopf eines beliebigen Spielers (z.B. für die Köpfe im Hauptmenü). Der Aufrufer muss Dispose() aufrufen.
+    // Die Vorlage gehört zur aktuellen Szene (kein DontDestroyOnLoad).
+    public async Task<HeadAsset> LoadHeadAssetAsync(string player)
+    {
+        string file = FindHeadFile(player);
+        if (file == null) return null;
+
+        try
+        {
+            byte[] data = await Task.Run(() => File.ReadAllBytes(file));
+            var gltf = new GLTFast.GltfImport();
+            if (!await gltf.Load(data, new Uri(file)))
+            {
+                gltf.Dispose();
+                return null;
+            }
+
+            var template = new GameObject("HeadTemplate " + player);
+            template.SetActive(false);
+            await gltf.InstantiateMainSceneAsync(template.transform);
+            ApplyHeadLook(template);
+            return new HeadAsset { Player = player, Template = template, Import = gltf };
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Fehler beim Laden des Kopfes " + file + ": " + e.Message);
+            return null;
+        }
+    }
+
     private void ClearHead()
     {
         if (HeadTemplate != null) Destroy(HeadTemplate);
@@ -352,11 +402,15 @@ public class PlayerDataManager : MonoBehaviour
     // Kopie des Kopfes in einen Block setzen: um 'center' zentriert, auf headSize der Blockgröße skaliert.
     // 'baseRotation' = Drehung des Glaskastens (NICHT des Sockets: der ist im Prefab für den alten FBX-Kopf gedreht).
     public GameObject CreateHead(Transform parent, Vector3 center, Quaternion baseRotation, float blockSize)
-    {
-        if (HeadTemplate == null) return null;
+        => CreateHead(HeadTemplate, SelectedPlayer, parent, center, baseRotation, blockSize);
 
-        GameObject head = Instantiate(HeadTemplate, parent);
-        head.name = "PlayerHead " + SelectedPlayer;
+    // Wie oben, aber mit einer beliebigen Vorlage (z.B. die Köpfe aller Spieler im Hauptmenü)
+    public GameObject CreateHead(GameObject template, string player, Transform parent, Vector3 center, Quaternion baseRotation, float blockSize)
+    {
+        if (template == null) return null;
+
+        GameObject head = Instantiate(template, parent);
+        head.name = "PlayerHead " + player;
         head.transform.localPosition = Vector3.zero;
         head.transform.rotation = baseRotation * Quaternion.Euler(config.headRotation);
         head.transform.localScale = Vector3.one;
