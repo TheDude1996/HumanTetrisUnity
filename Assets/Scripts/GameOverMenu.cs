@@ -18,12 +18,13 @@ public class GameOverMenu : MonoBehaviour
         if (detailText != null)
         {
             // Bestwert des gewählten Spielers (die aktuelle Runde wird im Hintergrund gespeichert, kann also schon drin sein)
+            // nur im selben Modus vergleichen (Kinect: 9 breit, Tastatur: 11 breit)
             int best = score;
             var data = PlayerDataManager.Existing;
-            var highscores = data != null ? data.GetPlayerHighscores() : null;
-            if (highscores != null && highscores.best != null) best = Mathf.Max(best, highscores.best.score);
+            var bestRound = data != null ? data.GetBest(GameSettings.ModeId) : null;
+            if (bestRound != null) best = Mathf.Max(best, bestRound.score);
 
-            string line = "LEVEL " + GameManager.LastLevel + "   ·   " + GameManager.LastLines + " LINES";
+            string line = GameSettings.ModeName + "   ·   LEVEL " + GameManager.LastLevel + "   ·   " + GameManager.LastLines + " LINES";
             string record = score > 0 && score >= best
                 ? "<color=#9EFF00>NEW BEST!</color>"
                 : "<color=#A4A8C2>BEST " + best + "</color>";

@@ -18,9 +18,12 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
     public GameObject originalPrefab;
 
     // Grid Definition
-    public static int width = 11;
+    // Das Grid ist immer 11 breit; benutzbar sind die Spalten MinX..MaxX (Kinect-Modus: 9, Tastatur-Modus: 11)
+    public static int width => GameSettings.FieldWidth;
+    public static int MinX => GameSettings.FieldMinX;
+    public static int MaxX => MinX + width - 1;
     public static int height = 20;
-    public static Transform[,] grid = new Transform[width, height];
+    public static Transform[,] grid = new Transform[GameSettings.MaxWidth, height];
 
     // --- Kinect ---
     private bool TposeActive = false;
@@ -36,8 +39,8 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
 
         fallTime = GameManager.Instance.GetFallTime();
 
-        // --- NEU: Sich selbst als Gesture-Listener beim KinectManager registrieren ---
-        RegisterAsGestureListener();
+        // Gesten nur im Kinect-Modus auswerten
+        if (GameSettings.KinectMode) RegisterAsGestureListener();
 
         // Ragt der Stein oben aus dem Feld (z. B. das senkrechte I), nach unten schieben
         while (TopRow() >= height)
@@ -421,7 +424,7 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
 
     bool HasLine(int y)
     {
-        for (int x = 0; x < width; x++)
+        for (int x = MinX; x <= MaxX; x++)
         {
             if (grid[x, y] == null)
                 return false;
@@ -431,7 +434,7 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
 
     void DeleteLine(int y)
     {
-        for (int x = 0; x < width; x++)
+        for (int x = MinX; x <= MaxX; x++)
         {
             Destroy(grid[x, y].gameObject);
             grid[x, y] = null;
@@ -442,7 +445,7 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
     {
         for (int y = row + 1; y < height; y++)
         {
-            for (int x = 0; x < width; x++)
+            for (int x = MinX; x <= MaxX; x++)
             {
                 if (grid[x, y] != null)
                 {
@@ -461,7 +464,7 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
             int x = Mathf.RoundToInt(collisionBlock.position.x / 4);
             int y = Mathf.RoundToInt(collisionBlock.position.y / 4);
 
-            if (x >= 0 && x < width && y >= 0 && y < height)
+            if (x >= MinX && x <= MaxX && y >= 0 && y < height)
             {
                 grid[x, y] = collisionBlock;
             }
@@ -485,7 +488,7 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
             int x = Mathf.RoundToInt(collisionBlock.position.x / 4);
             int y = Mathf.RoundToInt(collisionBlock.position.y / 4);
 
-            if (x < 0 || x >= width || y < 0 || y >= height)
+            if (x < MinX || x > MaxX || y < 0 || y >= height)
                 return false;
 
             if (grid[x, y] != null)

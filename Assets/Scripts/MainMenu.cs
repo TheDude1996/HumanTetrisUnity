@@ -11,12 +11,15 @@ public class MainMenu : MonoBehaviour {
     [Header("Spielerauswahl (Netzwerkordner, siehe PlayerDataManager)")]
     [Tooltip("Zeigt den gewählten Spieler, Ladezustand und Bestwert")]
     public TMP_Text playerLabel;
+    [Tooltip("Text auf dem Umschalter Kinect / Tastatur (Kinect: Feld 9 breit, Tastatur: 11 breit)")]
+    public TMP_Text modeLabel;
 
     void Start()
     {
         var data = PlayerDataManager.Instance;
         data.HeadChanged += UpdatePlayerLabel;
         RefreshPlayers();
+        UpdateModeLabel();
     }
 
     void OnDestroy()
@@ -50,6 +53,22 @@ public class MainMenu : MonoBehaviour {
 #else
         Application.OpenURL("file://" + folder);
 #endif
+    }
+
+    // ---------------- Modus ----------------
+
+    // Umschalter Kinect <-> Tastatur (Button bei der Spielerauswahl)
+    public void ToggleMode()
+    {
+        GameSettings.KinectMode = !GameSettings.KinectMode;
+        UpdateModeLabel();
+        UpdatePlayerLabel(); // Bestwert gilt pro Modus
+    }
+
+    void UpdateModeLabel()
+    {
+        if (modeLabel == null) return;
+        modeLabel.text = "MODE: " + GameSettings.ModeName + " (" + GameSettings.FieldWidth + ")";
     }
 
     // ---------------- Spielerauswahl ----------------
@@ -96,9 +115,10 @@ public class MainMenu : MonoBehaviour {
         if (data.HeadLoading) text += "  (loading...)";
         else if (data.HeadTemplate == null) text += "  (no scan)";
 
-        var scores = data.GetPlayerHighscores();
-        if (scores != null && scores.best != null)
-            text += "\n<size=70%>BEST: " + scores.best.score + "</size>";
+        // Bestwert im aktuell gewählten Modus (Feldbreiten sind nicht vergleichbar)
+        var best = data.GetBest(GameSettings.ModeId);
+        if (best != null)
+            text += "\n<size=70%>BEST (" + GameSettings.ModeName + "): " + best.score + "</size>";
 
         playerLabel.text = text;
     }

@@ -50,6 +50,7 @@ public class PlayerDataManager : MonoBehaviour
         public int level;
         public int lines;
         public string date;
+        public string mode;     // "kinect" (Feld 9 breit) oder "keyboard" (Feld 11 breit); leer = alte Runde vor dem Umschalter
     }
 
     [Serializable]
@@ -479,6 +480,7 @@ public class PlayerDataManager : MonoBehaviour
             score = score,
             level = level,
             lines = lines,
+            mode = GameSettings.ModeId,
             date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
         };
 
@@ -521,6 +523,21 @@ public class PlayerDataManager : MonoBehaviour
     {
         if (SelectedFolder == null) return null;
         return ReadJson<PlayerHighscores>(Path.Combine(SelectedFolder, HighscoreFileName));
+    }
+
+    // Beste Runde des gewählten Spielers im angegebenen Modus ("kinect"/"keyboard"). Alte Runden ohne Modus zählen als Tastatur (11 breit).
+    public Round GetBest(string mode)
+    {
+        var highscores = GetPlayerHighscores();
+        if (highscores == null || highscores.rounds == null) return null;
+
+        Round best = null;
+        foreach (var r in highscores.rounds)
+        {
+            string m = string.IsNullOrEmpty(r.mode) ? GameSettings.KeyboardId : r.mode;
+            if (m == mode && (best == null || r.score > best.score)) best = r;
+        }
+        return best;
     }
 
     public Leaderboard GetLeaderboard()
