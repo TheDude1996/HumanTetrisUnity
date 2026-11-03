@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 45afa11d99bf4144786e846887dfe73f, type: 2}
+  - {fileID: 2100000, guid: b6ad7e8076063334f8ca500f76d7080a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -171,7 +171,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 45afa11d99bf4144786e846887dfe73f, type: 2}
+  - {fileID: 2100000, guid: b6ad7e8076063334f8ca500f76d7080a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -225,6 +225,7 @@ GameObject:
   - component: {fileID: 7718234936656150520}
   - component: {fileID: -5502929811757104125}
   - component: {fileID: 6970737921063003016}
+  - component: {fileID: 8241832919354473797}
   m_Layer: 0
   m_Name: O-Tetromino
   m_TagString: Untagged
@@ -285,6 +286,18 @@ MonoBehaviour:
   ghostPrefab: {fileID: 7206552604750207460, guid: 909b0aa419426b242ab717d04bc7352a, type: 3}
   ghost: {fileID: 0}
   originalPrefab: {fileID: 0}
+--- !u!114 &8241832919354473797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7206552604750207460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4474eeb4f97f0d34aa91938ffc8c98c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8364698376139424282
 GameObject:
   m_ObjectHideFlags: 0
@@ -349,7 +362,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 45afa11d99bf4144786e846887dfe73f, type: 2}
+  - {fileID: 2100000, guid: b6ad7e8076063334f8ca500f76d7080a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

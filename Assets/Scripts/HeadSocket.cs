@@ -8,6 +8,10 @@ public class CollisionBlock : MonoBehaviour
 {
     public string modelName = "Blocks/PlayerHead";
 
+    [Tooltip("Zusätzliche Drehung des Kopfes um die Blickachse (z) in Grad, damit er zur Körperachse des Dummys passt. " +
+             "0 = aufrecht (Dummy steht), +90 = Kopfoberseite zeigt nach links (J-Stein), -90 = nach rechts (L-Stein)")]
+    public float tiltZ = 0f;
+
     private GameObject currentHead;
     private bool subscribed;
 
@@ -48,7 +52,7 @@ public class CollisionBlock : MonoBehaviour
         Transform box = transform.parent != null ? transform.parent : transform;
         float blockSize = transform.parent != null ? transform.parent.lossyScale.x : 4f;
 
-        GameObject head = PlayerDataManager.Instance.CreateHead(transform, box.position, box.rotation, blockSize);
+        GameObject head = PlayerDataManager.Instance.CreateHead(transform, box.position, box.rotation * Quaternion.Euler(0, 0, tiltZ), blockSize);
         if (head == null) return;
 
         if (currentHead != null) Destroy(currentHead);
@@ -70,7 +74,7 @@ public class CollisionBlock : MonoBehaviour
 
             // lokale Position anpassen
             newModel.transform.localPosition = Vector3.zero;
-            newModel.transform.localRotation = Quaternion.identity;
+            newModel.transform.localRotation = Quaternion.Euler(0, 0, tiltZ);
             currentHead = newModel;
         }
         else

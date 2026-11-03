@@ -280,6 +280,7 @@ public class PlayerDataManager : MonoBehaviour
             HeadTemplate = template;
             headImport = gltf;
             ApplyHeadLook();
+            BuildHeadQuadrants(); // großer Kopf für den O-Stein, schon im Menü vorbereiten
             Debug.Log("Kopf geladen: " + file);
         }
         catch (Exception e)
@@ -390,6 +391,7 @@ public class PlayerDataManager : MonoBehaviour
 
     private void ClearHead()
     {
+        DestroyHeadQuadrants();
         if (HeadTemplate != null) Destroy(HeadTemplate);
         HeadTemplate = null;
         HeadLoading = false;
@@ -398,6 +400,146 @@ public class PlayerDataManager : MonoBehaviour
         // Der Spieler wird aber nur im Menü gewechselt, dort gibt es keine Steine.
         headImport?.Dispose();
         headImport = null;
+    }
+
+    // ---------------- Großer Kopf (O-Stein: 2x2 Zellen) ----------------
+    //
+    // Der Kopf wird einmal auf BigHeadSize skaliert und in vier Viertel zerschnitten (nach Dreiecksmitte).
+    // Jede Zelle des O-Steins bekommt ihr Viertel (BigHeadBlock). So wandert/verschwindet beim Line Break
+    // nur der Teil der betroffenen Zelle, der Rest bleibt wie bei jedem anderen Stein erhalten.
+
+    public const float BigHeadSize = 8f;  // 2 Zellen à 4 Einheiten: Breite/Höhe des Kopfes füllen das Quadrat
+    public const float BigHeadDepth = 4f; // Tiefe wird auf die Zellentiefe gestaucht (der Kopf ist tiefer als breit)
+
+    private GameObject[] headQuadrants;  // Index: 0 = unten links, 1 = unten rechts, 2 = oben links, 3 = oben rechts
+    private readonly List<Mesh> quadrantMeshes = new List<Mesh>();
+
+    // Vorlagen der vier Viertel (Meshes in Welteinheiten, Mitte des Kopfes im Ursprung); null, wenn kein Kopf geladen ist
+    public GameObject[] GetHeadQuadrants()
+    {
+        if (headQuadrants == null) BuildHeadQuadrants();
+        return headQuadrants;
+    }
+
+    private void DestroyHeadQuadrants()
+    {
+        if (headQuadrants != null)
+            foreach (var q in headQuadrants) if (q != null) Destroy(q);
+        headQuadrants = null;
+        foreach (var m in quadrantMeshes) if (m != null) Destroy(m);
+        quadrantMeshes.Clear();
+    }
+
+    private void BuildHeadQuadrants()
+    {
+        DestroyHeadQuadrants();
+        if (HeadTemplate == null) return;
+
+        // Kopie in Spielausrichtung, auf BigHeadSize skaliert, Mitte im Ursprung
+        var temp = new GameObject("HeadQuadrantSource");
+        GameObject copy = Instantiate(HeadTemplate, temp.transform);
+        copy.transform.localPosition = Vector3.zero;
+        copy.transform.rotation = Quaternion.Euler(config.headRotation);
+        copy.transform.localScale = Vector3.one;
+        copy.SetActive(true);
+
+        // Breite/Höhe füllen das Quadrat (nicht die Tiefe, sonst bliebe das Gesicht zu klein), Mitte im Ursprung
+        var renderers = copy.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0) { Destroy(temp); return; }
+        Bounds b = renderers[0].bounds;
+        foreach (var rd in renderers) b.Encapsulate(rd.bounds);
+        float largestXY = Mathf.Max(b.size.x, b.size.y);
+        if (largestXY > 0) copy.transform.localScale *= BigHeadSize / largestXY;
+        b = renderers[0].bounds;
+        foreach (var rd in renderers) b.Encapsulate(rd.bounds);
+        copy.transform.position += -b.center;
+        float zScale = b.size.z > BigHeadDepth ? BigHeadDepth / b.size.z : 1f; // um z = 0 gestaucht (Mitte liegt im Ursprung)
+
+        var roots = new GameObject[4];
+        for (int i = 0; i < 4; i++)
+        {
+            roots[i] = new GameObject("HeadQuadrant " + i);
+            roots[i].SetActive(false); // Vorlage
+            DontDestroyOnLoad(roots[i]);
+        }
+
+        foreach (var mf in copy.GetComponentsInChildren<MeshFilter>())
+        {
+            Mesh src = mf.sharedMesh;
+            var mr = mf.GetComponent<MeshRenderer>();
+            if (src == null || mr == null) continue;
+            if (!src.isReadable) { Debug.LogWarning("Kopf-Mesh nicht lesbar, großer Kopf nicht möglich."); continue; }
+
+            Matrix4x4 toWorld = mf.transform.localToWorldMatrix;
+            Vector3[] v = src.vertices;
+            Vector3[] n = src.normals;
+            Vector2[] uv = src.uv;
+            Color32[] col = src.colors32;
+            for (int i = 0; i < v.Length; i++)
+            {
+                v[i] = toWorld.MultiplyPoint3x4(v[i]);
+                v[i].z *= zScale;
+            }
+            if (n.Length == v.Length) for (int i = 0; i < n.Length; i++) n[i] = toWorld.MultiplyVector(n[i]).normalized;
+
+            int subCount = src.subMeshCount;
+            var tris = new int[subCount][];
+            for (int s = 0; s < subCount; s++) tris[s] = src.GetTriangles(s);
+
+            for (int q = 0; q < 4; q++)
+            {
+                var map = new int[v.Length];
+                for (int i = 0; i < map.Length; i++) map[i] = -1;
+                var qv = new List<Vector3>(); var qn = new List<Vector3>(); var qu = new List<Vector2>(); var qc = new List<Color32>();
+                var qt = new List<int>[subCount];
+
+                for (int s = 0; s < subCount; s++)
+                {
+                    qt[s] = new List<int>();
+                    int[] t = tris[s];
+                    for (int i = 0; i < t.Length; i += 3)
+                    {
+                        Vector3 c = (v[t[i]] + v[t[i + 1]] + v[t[i + 2]]) / 3f;
+                        int quadrant = (c.x >= 0 ? 1 : 0) + (c.y >= 0 ? 2 : 0);
+                        if (quadrant != q) continue;
+
+                        for (int k = 0; k < 3; k++)
+                        {
+                            int old = t[i + k];
+                            if (map[old] < 0)
+                            {
+                                map[old] = qv.Count;
+                                qv.Add(v[old]);
+                                if (n.Length == v.Length) qn.Add(n[old]);
+                                if (uv.Length == v.Length) qu.Add(uv[old]);
+                                if (col.Length == v.Length) qc.Add(col[old]);
+                            }
+                            qt[s].Add(map[old]);
+                        }
+                    }
+                }
+
+                if (qv.Count == 0) continue;
+                var mesh = new Mesh { name = "HeadQuadrant " + q, indexFormat = UnityEngine.Rendering.IndexFormat.UInt32 };
+                mesh.SetVertices(qv);
+                if (qn.Count == qv.Count) mesh.SetNormals(qn);
+                if (qu.Count == qv.Count) mesh.SetUVs(0, qu);
+                if (qc.Count == qv.Count) mesh.SetColors(qc);
+                mesh.subMeshCount = subCount;
+                for (int s = 0; s < subCount; s++) mesh.SetTriangles(qt[s], s);
+                mesh.RecalculateBounds();
+                quadrantMeshes.Add(mesh);
+
+                var part = new GameObject(mf.name);
+                part.transform.SetParent(roots[q].transform, false);
+                part.AddComponent<MeshFilter>().sharedMesh = mesh;
+                var renderer = part.AddComponent<MeshRenderer>();
+                renderer.sharedMaterials = mr.sharedMaterials; // Material gehört dem Import, wie bei allen Kopien
+            }
+        }
+
+        Destroy(temp);
+        headQuadrants = roots;
     }
 
     // Kopie des Kopfes in einen Block setzen: um 'center' zentriert, auf headSize der Blockgröße skaliert.
