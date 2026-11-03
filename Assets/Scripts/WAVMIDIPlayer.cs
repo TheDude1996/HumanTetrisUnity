@@ -52,12 +52,12 @@ public class MidiWavPlayer : MonoBehaviour
     [Header("Begleitung (synthetischer 8-Bit-Sound)")]
     [Tooltip("Spielt die Melodie zusätzlich als Rechteckwelle und eine Basslinie als Dreieckwelle, taktgenau zur Stimme")]
     public bool playBacking = true;
-    [Tooltip("Lautstärke der Begleit-Melodie (Rechteckwelle) relativ zur Stimme (0.2 = 20 %)")]
+    [Tooltip("Lautstärke der Begleit-Melodie (Rechteckwelle) relativ zur Stimme (0.5 = 50 %)")]
     [Range(0f, 1f)]
-    public float backingVolume = 0.2f;
-    [Tooltip("Lautstärke der Basslinie relativ zur Stimme (0.4 = 40 %)")]
+    public float backingVolume = 0.5f;
+    [Tooltip("Lautstärke der Basslinie relativ zur Stimme (0.5 = 50 %)")]
     [Range(0f, 1f)]
-    public float bassVolume = 0.4f;
+    public float bassVolume = 0.5f;
 
     // Basslinie: Grundton je Takt (MIDI-Note) zur Akkordfolge von Korobeiniki, Teil A + B (passt zu Korobeiniki.mid)
     // Teil A: E | Am | E | Am | Dm | Am | E | Am    Teil B: Am | E | Am | E | Am | E | Am | E
