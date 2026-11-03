@@ -217,12 +217,20 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4012970854649530466, guid: be1f154a1bed3d1488b0b4eff243ebbe, type: 3}
+      propertyPath: bassVolume
+      value: 0.729
+      objectReference: {fileID: 0}
+    - target: {fileID: 4012970854649530466, guid: be1f154a1bed3d1488b0b4eff243ebbe, type: 3}
       propertyPath: wavFileName
       value: kinect_sample.wav
       objectReference: {fileID: 0}
     - target: {fileID: 4012970854649530466, guid: be1f154a1bed3d1488b0b4eff243ebbe, type: 3}
       propertyPath: midiFileName
       value: Korobeiniki.mid
+      objectReference: {fileID: 0}
+    - target: {fileID: 4012970854649530466, guid: be1f154a1bed3d1488b0b4eff243ebbe, type: 3}
+      propertyPath: backingVolume
+      value: 0.422
       objectReference: {fileID: 0}
     - target: {fileID: 7938483725510317847, guid: be1f154a1bed3d1488b0b4eff243ebbe, type: 3}
       propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
@@ -2397,6 +2405,14 @@ PrefabInstance:
     - target: {fileID: 1019161642374581423, guid: 23d123cc1386ea048bdd64b97dc93b1a, type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1019161642374581423, guid: 23d123cc1386ea048bdd64b97dc93b1a, type: 3}
+      propertyPath: ComputeUserMap
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1019161642374581423, guid: 23d123cc1386ea048bdd64b97dc93b1a, type: 3}
+      propertyPath: MaxUserDistance
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1019161642374581423, guid: 23d123cc1386ea048bdd64b97dc93b1a, type: 3}
       propertyPath: 'Player1Gestures.Array.data[3]'

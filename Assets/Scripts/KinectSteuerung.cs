@@ -30,9 +30,21 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
     private bool moveLeftActive = false;
     private bool moveRightActive = false;
 
-    private float moveRepeatTime = 0.2f; // Wiederholrate für Links/Rechts, solange Hand oben ist
-    private float moveRepeatTimeTpose = 0.7f;
+    // Timing der Gesten (Sekunden). Statisch, damit alle Steine dieselben Werte nutzen (Debug-Menü zeigt sie an).
+    // Hinweis: Die Haltezeit der Posen selbst steht in KinectWrapper.Constants.PoseCompleteDuration (0,25 s).
+    public static float MoveRepeatTime = 0.15f;        // Wiederholrate für Links/Rechts, solange Hand oben ist (vorher 0,2)
+    public static float RotateRepeatTimeTpose = 0.5f;  // Wiederholrate fürs Drehen, solange T-Pose gehalten wird (vorher 0,7)
     private float previousMoveTime;
+    private float previousRotateTime; // eigener Timer: Bewegen und Drehen blockieren sich nicht mehr gegenseitig
+
+    // Für das Debug-Menü (KinectDebugOverlay)
+    public static bool DebugMoveLeft, DebugMoveRight, DebugTpose;
+    public static readonly List<string> GestureLog = new List<string>();
+    static void LogGesture(string text)
+    {
+        GestureLog.Add(Time.time.ToString("F1") + "s  " + text);
+        if (GestureLog.Count > 8) GestureLog.RemoveAt(0);
+    }
     void Start()
     {
         previousTime = Time.time;
@@ -59,6 +71,8 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
 
     void Update()
     {
+        DebugMoveLeft = moveLeftActive; DebugMoveRight = moveRightActive; DebugTpose = TposeActive;
+
         // --- Bewegung Links/Rechts (Tastatur) ---
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
@@ -140,7 +154,7 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
         }
 
         // --- Kontinuierliches Verschieben, solange Hand-Geste aktiv ist ---
-        if ((moveLeftActive || moveRightActive) && Time.time - previousMoveTime > moveRepeatTime)
+        if ((moveLeftActive || moveRightActive) && Time.time - previousMoveTime > MoveRepeatTime)
         {
             if (moveLeftActive) TryMove(new Vector3(-4, 0, 0));
             if (moveRightActive) TryMove(new Vector3(4, 0, 0));
@@ -150,13 +164,13 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
             previousMoveTime = Time.time;
         }
 
-        if ((TposeActive) && Time.time - previousMoveTime > moveRepeatTimeTpose)
+        if ((TposeActive) && Time.time - previousRotateTime > RotateRepeatTimeTpose)
         {
             //if (moveLeftActive) TryMove(new Vector3(-4, 0, 0));
             //if (moveRightActive) TryMove(new Vector3(4, 0, 0));
 
             if (TposeActive) TryRotate();
-            previousMoveTime = Time.time;
+            previousRotateTime = Time.time;
         }
     }
     void UpdateGhost()
@@ -321,6 +335,7 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
     {
         // Gelandeter oder gerade gehaltener Stein ist bis zum Abmelden noch registriert -> ignorieren
         if (!enabled || hasDropped) return true;
+        LogGesture("+ " + gesture);
 
         switch (gesture)
         {
@@ -345,14 +360,17 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
             // --- Kontinuierliche Bewegung, solange Hand zur Seite gehoben wird---
             case KinectGestures.Gestures.RaiseRightHand:
                 moveRightActive = true;
+                if (!moveLeftActive) { TryMove(new Vector3(4, 0, 0)); previousMoveTime = Time.time; } // erster Schritt sofort
                 break;
 
             case KinectGestures.Gestures.RaiseLeftHand:
                 moveLeftActive = true;
+                if (!moveRightActive) { TryMove(new Vector3(-4, 0, 0)); previousMoveTime = Time.time; } // erster Schritt sofort
                 break;
             
             case KinectGestures.Gestures.Tpose:
                 TposeActive = true;
+                TryRotate(); previousRotateTime = Time.time; // erste Drehung sofort
                 break;
 
                 //case KinectGestures.Gestures.Tpose:
@@ -371,6 +389,7 @@ public class KinectSteuerung : MonoBehaviour, KinectGestures.GestureListenerInte
     public bool GestureCancelled(uint userId, int userIndex, KinectGestures.Gestures gesture,
                                   KinectWrapper.NuiSkeletonPositionIndex joint)
     {
+        LogGesture("- " + gesture);
         switch (gesture)
         {
             case KinectGestures.Gestures.Tpose:
