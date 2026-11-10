@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
     }
 
     [Tooltip("Nach wie vielen gelöschten Linien das Level steigt")]
-    public int linesPerLevel = 10;
+    private int linesPerLevel = 4;
 
     // Grundpunkte für 1/2/3/4 Linien auf einmal (klassisch), werden mit dem Level multipliziert
     private static readonly int[] lineScores = { 0, 100, 300, 500, 800 };
@@ -72,15 +72,15 @@ public class GameManager : MonoBehaviour
 
     private readonly float[] fallTimes =
     {
-        0.80f, // Level 1
-        0.72f, // Level 2
-        0.63f, // Level 3
-        0.55f, // Level 4
-        0.47f, // Level 5
-        0.40f, // Level 6
-        0.33f, // Level 7
-        0.27f, // Level 8
-        0.22f, // Level 9
+        0.60f, // Level 1
+        0.50f, // Level 2
+        0.40f, // Level 3
+        0.37f, // Level 4
+        0.33f, // Level 5
+        0.30f, // Level 6
+        0.27f, // Level 7
+        0.23f, // Level 8
+        0.20f, // Level 9
         0.18f, // Level 10
         0.15f, // Level 11
         0.12f, // Level 12
