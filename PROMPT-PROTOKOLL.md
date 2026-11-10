@@ -176,3 +176,15 @@ Die Prompts dieses Tages sind nicht erhalten. Umgesetzt wurde laut Commits auf `
 
 **Umsetzung:** Unity hatte sich nicht beim MCP-Server angemeldet; die Bridge über ein temporäres Editor-Skript neu gestartet. Glaskästen im Play-Mode geprüft (Menü und Spiel), Commit `fdad2de` gepusht. Manuelle Änderungen (Level alle 4 Linien, schnellere Fallzeiten, Spawner y = 68, Scans `Playermodell_0005`/`0006`, neue `kinect_sample.wav`) als `c17481c` committet und gepusht. `MenuTetrominoPile` zeigt im Haufen nur noch die Köpfe der Spieler 1–4 (`minPlayerNumber`/`maxPlayerNumber`); die Spielerauswahl enthält weiter alle Spieler.
 
+### 27. Steine im Hauptmenü: großer Kopf im O, kein Dummy kopfüber
+
+**Prompt:** (Screenshots eines O- und eines L-Steins aus dem Menü-Haufen) „diese steine im hauptmenu musst du nochmal anschauen“
+
+**Umsetzung:** Im Haufen fehlte beim O-Stein der große Kopf (die Skripte, auch `BigHeadBlock`, werden dort entfernt), und die Köpfe standen immer aufrecht, auch wenn der Dummy durch die Drehung kopfüber stand. Jetzt: O-Stein mit großem Kopf über alle vier Zellen (`PlayerDataManager.CreateBigHead`), Köpfe drehen mit dem Stein und folgen der Pose (`tiltZ`), und Drehungen mit kopfüber stehendem Dummy werden beim Aufbau des Haufens ausgelassen.
+
+### 28. Dummy ragt aus den Glaskästen
+
+**Prompt:** (Auftrag aus einer anderen Claude-Session, mit Screenshot eines blauen J-Steins) Bei manchen Steinen ragt der Dummy-Körper aus den Glaskästen; betroffene Steine finden und die Posen anpassen.
+
+**Umsetzung:** Neues Prüfwerkzeug `Tools/Dummy in Tetrominos/Check bounds` (`DummyTetrominoBuilder.CheckBounds`): prüft alle Vertices der `DummyPart`-Meshes gegen die Zellen des Steins. Betroffen waren 6 von 7 Steinen (O hat keinen Dummy): J/L Füße 1,4 Einheiten seitlich hinaus und Zehen 1,0 nach vorne, I Schultern/Arme 0,35 zu breit, S/Z/T Füße bzw. Knie bis 0,9 nach vorne und Becken 0,45 unter der Zelle. Angepasst: I Arme gerade nach unten; J/L Dummy kleiner (k 6,5), Knie angewinkelt, Arm steiler in die obere Zelle; S/Z k 6,2, Beine gestreckt mit Zehen nach oben; T k 6,2, Arme leicht gesenkt, Schneidersitz flacher, Füße seitlich. Neue Pose-Felder `footA`/`footB` (Zehenrichtung). Alle Prefabs neu gebaut, Prüfung meldet keinen Überstand mehr, Vorschaubilder kontrolliert.
+

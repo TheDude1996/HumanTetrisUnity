@@ -44,6 +44,7 @@ public static class DummyTetrominoBuilder
         // Richtungen (x, y, z): z < 0 = zur Kamera
         public Vector3 armA_up, armA_fore, armB_up, armB_fore;
         public Vector3 legA_up, legA_lo, legB_up, legB_lo;
+        public Vector3 footA, footB;         // Richtung Ferse -> Zehen (0 = wie im Modell, Zehen zur Kamera)
     }
 
     static List<Pose> BuildPoses()
@@ -52,22 +53,27 @@ public static class DummyTetrominoBuilder
 
         return new List<Pose>
         {
-            // I: stehend, Arme locker neben dem Körper
+            // Alle Posen sind mit Tools/Dummy in Tetrominos/Check bounds geprüft: nichts ragt aus den Kästen.
+            // Nach Änderungen neu bauen und erneut prüfen.
+
+            // I: stehend, Arme gerade neben dem Körper (abgespreizt wären sie breiter als die Zelle)
             new Pose { piece = "I", material = "HumanDummy.mat", spineUp = Vector2.up, pick = Pick.ByX,
-                armA_up = V(-0.3f, -1), armA_fore = V(-0.1f, -1), armB_up = V(0.3f, -1), armB_fore = V(0.1f, -1),
+                armA_up = V(-0.04f, -1), armA_fore = V(0.06f, -1), armB_up = V(0.04f, -1), armB_fore = V(-0.06f, -1),
                 legA_up = V(-0.1f, -1), legA_lo = V(-0.05f, -1), legB_up = V(0.1f, -1), legB_lo = V(0.05f, -1) },
 
-            // J: liegt, Kopf links, Beine nach rechts, ein Arm nach oben (Zelle über dem Kopf)
-            new Pose { piece = "J", material = "HumanDummy.mat", spineUp = new Vector2(-1, 0), pick = Pick.ByY, headTilt = 90f,
-                armScale = 0.8f, legScale = 0.85f,
-                armA_up = V(-0.5f, 1), armA_fore = V(-0.3f, 1), armB_up = V(1, -0.1f), armB_fore = V(1, -0.05f),
-                legA_up = V(1, 0.1f, 0.2f), legA_lo = V(1, 0.05f, 0.2f), legB_up = V(1, -0.1f, -0.2f), legB_lo = V(1, -0.05f, -0.2f) },
+            // J: liegt, Kopf links, Beine nach rechts mit angewinkelten Knien (gestreckt wären sie zu lang), ein Arm nach oben
+            new Pose { piece = "J", material = "HumanDummy.mat", k = 6.5f, spineUp = new Vector2(-1, 0), pick = Pick.ByY, headTilt = 90f,
+                armScale = 0.8f, legScale = 0.8f,
+                armA_up = V(-0.75f, 1), armA_fore = V(-0.35f, 1), armB_up = V(1, -0.1f), armB_fore = V(1, -0.05f),
+                legA_up = V(1, 0.5f, -0.5f), legA_lo = V(1, -0.5f, 0.5f), legB_up = V(1, 0.3f, -0.5f), legB_lo = V(1, -0.7f, 0.5f),
+                footA = V(0.3f, 0, -1), footB = V(0.3f, 0, -1) },
 
             // L: Spiegelbild von J
-            new Pose { piece = "L", material = "HumanDummy.mat", spineUp = new Vector2(1, 0), pick = Pick.ByY, headTilt = -90f,
-                armScale = 0.8f, legScale = 0.85f,
-                armA_up = V(0.5f, 1), armA_fore = V(0.3f, 1), armB_up = V(-1, -0.1f), armB_fore = V(-1, -0.05f),
-                legA_up = V(-1, 0.1f, 0.2f), legA_lo = V(-1, 0.05f, 0.2f), legB_up = V(-1, -0.1f, -0.2f), legB_lo = V(-1, -0.05f, -0.2f) },
+            new Pose { piece = "L", material = "HumanDummy.mat", k = 6.5f, spineUp = new Vector2(1, 0), pick = Pick.ByY, headTilt = -90f,
+                armScale = 0.8f, legScale = 0.8f,
+                armA_up = V(0.75f, 1), armA_fore = V(0.35f, 1), armB_up = V(-1, -0.1f), armB_fore = V(-1, -0.05f),
+                legA_up = V(-1, 0.5f, -0.5f), legA_lo = V(-1, -0.5f, 0.5f), legB_up = V(-1, 0.3f, -0.5f), legB_lo = V(-1, -0.7f, 0.5f),
+                footA = V(-0.3f, 0, -1), footB = V(-0.3f, 0, -1) },
 
             // O: sitzt, Beine nach rechts, rechter Arm winkt in der Zelle oben rechts
             new Pose { piece = "O", material = "HumanDummy.mat", headOnly = true, spineUp = Vector2.up, pick = Pick.ByX,
@@ -75,23 +81,26 @@ public static class DummyTetrominoBuilder
                 armA_up = V(-0.1f, -1), armA_fore = V(-0.05f, -1), armB_up = V(0.7f, 0.7f), armB_fore = V(0.5f, 1),
                 legA_up = V(1, 0.05f, 0.25f), legA_lo = V(1, -0.05f, 0.25f), legB_up = V(1, 0.05f, -0.25f), legB_lo = V(1, -0.05f, -0.25f) },
 
-            // S: sitzt, Beine nach rechts, linker Arm hoch (Zelle oben links)
-            new Pose { piece = "S", material = "HumanDummy.mat", spineUp = Vector2.up, pick = Pick.ByX,
+            // S: sitzt, Beine nach rechts (Zehen nach oben), linker Arm hoch (Zelle oben links)
+            new Pose { piece = "S", material = "HumanDummy.mat", k = 6.2f, spineUp = Vector2.up, pick = Pick.ByX,
                 armScale = 0.85f, legScale = 0.85f,
                 armA_up = V(-0.7f, 0.7f), armA_fore = V(-0.5f, 1), armB_up = V(0.1f, -1), armB_fore = V(0.3f, -1),
-                legA_up = V(1, 0.05f, 0.25f), legA_lo = V(1, -0.05f, 0.25f), legB_up = V(1, 0.05f, -0.25f), legB_lo = V(1, -0.05f, -0.25f) },
+                legA_up = V(1, 0.05f, 0.25f), legA_lo = V(1, 0.05f, 0.25f), legB_up = V(1, 0.05f, -0.25f), legB_lo = V(1, 0.05f, -0.25f),
+                footA = V(0.3f, 1, 0), footB = V(0.3f, 1, 0) },
 
-            // T: Arme waagerecht (T-Pose), Schneidersitz (Beine bleiben in der Zeile)
-            new Pose { piece = "T", material = "HumanDummy.mat", spineUp = Vector2.up, pick = Pick.ByX,
+            // T: Arme fast waagerecht (T-Pose), Schneidersitz (Beine bleiben in der Zeile, Füße seitlich)
+            new Pose { piece = "T", material = "HumanDummy.mat", k = 6.2f, spineUp = Vector2.up, pick = Pick.ByX,
                 armScale = 0.85f, legScale = 0.8f,
-                armA_up = V(-1, 0), armA_fore = V(-1, 0), armB_up = V(1, 0), armB_fore = V(1, 0),
-                legA_up = V(-1, 0.1f, -0.45f), legA_lo = V(0.9f, 0.1f, -0.6f), legB_up = V(1, 0.1f, -0.45f), legB_lo = V(-0.9f, 0.1f, -0.6f) },
+                armA_up = V(-1, -0.12f), armA_fore = V(-1, -0.05f), armB_up = V(1, -0.12f), armB_fore = V(1, -0.05f),
+                legA_up = V(-1, 0.15f, -0.25f), legA_lo = V(0.9f, 0.1f, -0.3f), legB_up = V(1, 0.15f, -0.25f), legB_lo = V(-0.9f, 0.1f, -0.3f),
+                footA = V(1, 0, 0.3f), footB = V(-1, 0, 0.3f) },
 
-            // Z: sitzt, Beine nach links, rechter Arm hoch (Zelle oben rechts)
-            new Pose { piece = "Z", material = "HumanDummy.mat", spineUp = Vector2.up, pick = Pick.ByX,
+            // Z: sitzt, Beine nach links (Zehen nach oben), rechter Arm hoch (Zelle oben rechts)
+            new Pose { piece = "Z", material = "HumanDummy.mat", k = 6.2f, spineUp = Vector2.up, pick = Pick.ByX,
                 armScale = 0.85f, legScale = 0.85f,
                 armA_up = V(-0.1f, -1), armA_fore = V(-0.3f, -1), armB_up = V(0.7f, 0.7f), armB_fore = V(0.5f, 1),
-                legA_up = V(-1, 0.05f, 0.25f), legA_lo = V(-1, -0.05f, 0.25f), legB_up = V(-1, 0.05f, -0.25f), legB_lo = V(-1, -0.05f, -0.25f) },
+                legA_up = V(-1, 0.05f, 0.25f), legA_lo = V(-1, 0.05f, 0.25f), legB_up = V(-1, 0.05f, -0.25f), legB_lo = V(-1, 0.05f, -0.25f),
+                footA = V(-0.3f, 1, 0), footB = V(-0.3f, 1, 0) },
         };
     }
 
@@ -272,10 +281,18 @@ public static class DummyTetrominoBuilder
         Limb(root, armLIsA ? "R" : "L", "arm", p.armScale, p.armB_up, p.armB_fore);
         Limb(root, legLIsA ? "L" : "R", "leg", p.legScale, p.legA_up, p.legA_lo);
         Limb(root, legLIsA ? "R" : "L", "leg", p.legScale, p.legB_up, p.legB_lo);
+        Foot(root, legLIsA ? "L" : "R", p.footA);
+        Foot(root, legLIsA ? "R" : "L", p.footB);
 
         // Hals auf die Unterkante der Kopfzelle legen (Kopf-Scan ist ca. 3,8 Einheiten groß)
         Vector3 neckTarget = headCenter - new Vector3(p.spineUp.x, p.spineUp.y, 0) * 1.6f;
         root.position += neckTarget - neck.position;
+    }
+
+    static void Foot(Transform root, string side, Vector3 dir)
+    {
+        if (dir == Vector3.zero) return;
+        Aim(Find(root, "B-foot." + side), Find(root, "B-toe." + side), dir);
     }
 
     static void Limb(Transform root, string side, string kind, float scale, Vector3 upDir, Vector3 lowDir)
@@ -379,6 +396,69 @@ public static class DummyTetrominoBuilder
         }
     }
 
+    // ------------------------------------------------------------------ Prüfung: ragt der Dummy aus den Kästen?
+
+    // Prüft für jeden Stein, ob Vertices der DummyPart-Meshes außerhalb aller Zellen des Steins liegen
+    // (Zelle = Würfel mit der Kantenlänge ihrer Skalierung, also 4 Einheiten). Ergebnis gruppiert nach
+    // Zelle und Richtung, mit größtem Überstand in Einheiten und ungefährer Lage im Stein.
+    public static string CheckBounds(float tolerance = 0.05f)
+    {
+        var sb = new System.Text.StringBuilder();
+        int problems = 0;
+        foreach (var pose in BuildPoses())
+        {
+            if (pose.headOnly) continue;
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PieceDir + pose.piece + "-Tetromino.prefab");
+            Transform[] cells = prefab.transform.Cast<Transform>().Where(c => c.GetComponent<MeshRenderer>() != null).ToArray();
+
+            var groups = new Dictionary<string, (float max, int count, Vector3 at)>();
+            foreach (var cell in cells)
+            {
+                var part = cell.Find(PartName);
+                if (part == null) continue;
+                Mesh mesh = part.GetComponent<MeshFilter>().sharedMesh;
+                Matrix4x4 m = Matrix4x4.TRS(cell.localPosition, cell.localRotation, cell.localScale)
+                            * Matrix4x4.TRS(part.localPosition, part.localRotation, part.localScale);
+                foreach (Vector3 v in mesh.vertices)
+                {
+                    Vector3 p = m.MultiplyPoint3x4(v);
+                    // Abstand zur nächsten Zelle (0 = in einer Zelle)
+                    float best = float.MaxValue; Transform near = null; Vector3 over = Vector3.zero;
+                    foreach (var c in cells)
+                    {
+                        Vector3 d = p - c.localPosition;
+                        Vector3 half = c.localScale * 0.5f;
+                        Vector3 o = new Vector3(Over(d.x, half.x), Over(d.y, half.y), Over(d.z, half.z));
+                        if (o.magnitude < best) { best = o.magnitude; near = c; over = o; }
+                    }
+                    if (best <= tolerance) continue;
+
+                    string dir = "";
+                    if (Mathf.Abs(over.x) > tolerance) dir += over.x > 0 ? "rechts " : "links ";
+                    if (Mathf.Abs(over.y) > tolerance) dir += over.y > 0 ? "oben " : "unten ";
+                    if (Mathf.Abs(over.z) > tolerance) dir += over.z > 0 ? "hinten(+z) " : "vorne(-z) ";
+                    string key = near.name + ": " + dir.Trim();
+                    groups.TryGetValue(key, out var g);
+                    if (best > g.max) g.at = p;
+                    groups[key] = (Mathf.Max(g.max, best), g.count + 1, g.at);
+                }
+            }
+
+            if (groups.Count == 0) { sb.AppendLine(pose.piece + ": OK"); continue; }
+            problems++;
+            sb.AppendLine(pose.piece + ": ragt heraus");
+            foreach (var kv in groups.OrderByDescending(k => k.Value.max))
+                sb.AppendLine(string.Format("   {0}  max {1:0.00} Einheiten, {2} Vertices, z.B. bei {3}", kv.Key, kv.Value.max, kv.Value.count, kv.Value.at));
+        }
+        sb.Insert(0, problems == 0 ? "Alle Dummys liegen in ihren Kästen.\n" : problems + " Stein(e) mit Überstand:\n");
+        return sb.ToString();
+    }
+
+    static float Over(float d, float half) => d > half ? d - half : d < -half ? d + half : 0f;
+
+    [MenuItem("Tools/Dummy in Tetrominos/Check bounds")]
+    static void CheckBoundsMenu() => Debug.Log(CheckBounds());
+
     // ------------------------------------------------------------------ Vorschau (Test)
 
     // Rendert die Prefabs der Steine als PNG, um die Posen zu prüfen.
@@ -418,6 +498,7 @@ public static class DummyTetrominoBuilder
                 tex.Apply();
                 File.WriteAllBytes(Path.Combine(outDir, pose.piece + ".png"), tex.EncodeToPNG());
                 RenderTexture.active = null;
+                cam.targetTexture = null;
                 Object.DestroyImmediate(tex); rt.Release(); Object.DestroyImmediate(rt);
             }
             finally
