@@ -6,6 +6,10 @@
 //
 // Zwei Durchgänge: erst die Rückseiten, dann die Vorderseiten. Bei undurchsichtigen Blöcken
 // verdecken die Vorderseiten die Rückseiten; beim Glaskasten sieht man so auch die hinteren Kanten.
+//
+// Glas: _FaceAlpha > 0 tönt die Scheiben in der Blockfarbe. _FrontClear = 1 macht die Scheibe zur
+// Kamera (Welt-Normale -z) ganz durchsichtig (Kopfkasten). _Highlight/_Darken bestimmen, wie stark
+// die Schattierung Richtung Weiß bzw. Schwarz geht (klein = Kanten bleiben in der Blockfarbe).
 Shader "HumanTetris/BevelBlock"
 {
     Properties
@@ -16,6 +20,9 @@ Shader "HumanTetris/BevelBlock"
         _BevelShade ("Schattierung Schrägen", Range(0, 2)) = 1.6
         _FaceAlpha ("Deckkraft Flächen", Range(0, 1)) = 1
         _BevelAlpha ("Deckkraft Schrägen", Range(0, 1)) = 1
+        _Highlight ("Aufhellung zum Licht", Range(0, 1)) = 0.6
+        _Darken ("Abdunkeln vom Licht weg", Range(0, 1)) = 0.8
+        [Toggle] _FrontClear ("Vorderscheibe klar (-z)", Float) = 0
         [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend ("Src Blend", Float) = 1
         [Enum(UnityEngine.Rendering.BlendMode)] _DstBlend ("Dst Blend", Float) = 0
         [Enum(Off, 0, On, 1)] _ZWrite ("ZWrite", Float) = 1
@@ -30,6 +37,9 @@ Shader "HumanTetris/BevelBlock"
     half _BevelShade;
     half _FaceAlpha;
     half _BevelAlpha;
+    half _Highlight;
+    half _Darken;
+    half _FrontClear;
 
     struct appdata
     {
@@ -63,10 +73,12 @@ Shader "HumanTetris/BevelBlock"
         float s = dot(n.xy, l) * lerp(_FaceShade, _BevelShade, i.bevel);
 
         fixed3 c = s > 0
-            ? lerp(_Color.rgb, fixed3(1, 1, 1), saturate(s * 0.6))
-            : _Color.rgb * saturate(1 + s * 0.8);
+            ? lerp(_Color.rgb, fixed3(1, 1, 1), saturate(s * _Highlight))
+            : _Color.rgb * saturate(1 + s * _Darken);
 
-        fixed4 col = fixed4(c, _Color.a * lerp(_FaceAlpha, _BevelAlpha, i.bevel));
+        half a = _Color.a * lerp(_FaceAlpha, _BevelAlpha, i.bevel);
+        a *= 1 - _FrontClear * (1 - i.bevel) * step(n.z, -0.5); // klare Vorderscheibe
+        fixed4 col = fixed4(c, a);
         UNITY_APPLY_FOG(i.fogCoord, col);
         return col;
     }

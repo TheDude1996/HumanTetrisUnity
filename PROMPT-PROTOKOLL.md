@@ -161,3 +161,12 @@ Die Prompts dieses Tages sind nicht erhalten. Umgesetzt wurde laut Commits auf `
 **Prompt:** „schau dir bitte das claude md von human tetris an und ergänze es ggf mit einem prompt protokoll werte dafür ggf die dazugehörigen chats aus“
 
 **Umsetzung:** Dieses Protokoll angelegt und `CLAUDE.md` aktualisiert (Verweis hierauf, aktueller Stand, Kopf-Größen).
+
+## 10.11.2026 — Farbige Glaskästen
+
+### 25. Kanten und Glas in Steinfarbe, klarer Kopfkasten
+
+**Prompt:** (Screenshot der Tetromino-Prefabs, Auftrag aus einer anderen Claude-Session) Alle Kanten der Glaskästen in der Farbe des Steins, Glas durchsichtig, aber in Steinfarbe getönt; am Kopfkasten (`Glascube`) und beim großen Kopf im O-Stein bleibt die Vorderscheibe farblos. Ghost-Prefabs nicht verändern.
+
+**Umsetzung:** Shader `BevelBlock` um `_Highlight`/`_Darken` (wie stark Kanten Richtung Weiß/Schwarz schattiert werden) und `_FrontClear` (Scheibe zur Kamera durchsichtig) erweitert; Standardwerte lassen alle anderen Materialien unverändert. `DummyTetrominoBuilder` setzt Tönung und Kanten jetzt bei jedem Neubau und legt pro Stein ein `<Stein>_Kopfglas.mat` für den Kopfkasten an (O-Stein: alle vier Zellen). Alle 7 Prefabs neu gebaut, Kontrolle über die Vorschaubilder in `Temp/DummyPreviews`. Da der Unity-MCP-Server nicht erreichbar war, lief der Neubau über ein temporäres Editor-Skript (danach wieder gelöscht). Noch nicht committet.
+

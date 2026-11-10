@@ -22,6 +22,13 @@ public static class DummyTetrominoBuilder
     const string PartName = "DummyPart";
     const string HeadCellName = "Glascube";
 
+    // Glas-Look aller Kästen (Shader HumanTetris/BevelBlock). Linear-Farbraum: kleine Alpha-Werte wirken schon deutlich.
+    const float GlassTint = 0.10f;      // Deckkraft der getönten Scheiben (Vorder- und Rückseite zusammen ca. doppelt)
+    const float GlassTintWhite = 0.05f; // O-Stein (weiß) schwächer, sonst wirkt er milchig
+    const float EdgeAlpha = 0.95f;      // Kanten
+    const float EdgeHighlight = 0.2f;   // Kanten nur leicht aufhellen/abdunkeln -> bleiben in der Steinfarbe
+    const float EdgeDarken = 0.35f;
+
     enum Pick { ByX, ByY } // wie die zwei Arme/Beine den Rollen A/B zugeordnet werden: A = links (kleineres x) bzw. oben (größeres y)
 
     class Pose
@@ -123,9 +130,11 @@ public static class DummyTetrominoBuilder
             Transform headCell = cells.First(c => c.name == HeadCellName);
 
             // O-Stein: nur der Kopf-Scan, so groß wie das ganze Quadrat (BigHeadBlock); alle vier Zellen sind weiße Glaskästen
+            // mit klarer Vorderscheibe, damit der große Kopf ungetönt zu sehen ist
             if (pose.headOnly)
             {
-                var whiteGlass = AssetDatabase.LoadAssetAtPath<Material>("Assets/Material/Glaskasten Bevel.mat");
+                var white = AssetDatabase.LoadAssetAtPath<Material>("Assets/Material/Glaskasten Bevel.mat");
+                Material whiteGlass = MakeGlassMaterial(pose.piece, white.GetColor("_Color"), "_Kopfglas", true, GlassTintWhite);
                 foreach (var c in cells) c.GetComponent<MeshRenderer>().sharedMaterial = whiteGlass;
                 if (contents.GetComponent<BigHeadBlock>() == null) contents.AddComponent<BigHeadBlock>();
                 PrefabUtility.SaveAsPrefabAsset(contents, prefabPath);
@@ -136,9 +145,12 @@ public static class DummyTetrominoBuilder
                 socket.tiltZ = pose.headTilt;
 
             // Körperzellen werden durchsichtige Kästen in der Farbe des Steins (sonst wäre der Dummy verdeckt)
-            Material glass = MakeGlassMaterial(pose.piece, cells.First(c => c != headCell).GetComponent<MeshRenderer>().sharedMaterial);
+            Material glass = MakeGlassMaterial(pose.piece, cells.First(c => c != headCell).GetComponent<MeshRenderer>().sharedMaterial.GetColor("_Color"), "_Glas", false, GlassTint);
             foreach (var c in cells)
                 if (c != headCell) c.GetComponent<MeshRenderer>().sharedMaterial = glass;
+
+            // Kopfkasten: gleiche Farbe, aber klare Vorderscheibe (Kopf-Scan ungetönt)
+            headCell.GetComponent<MeshRenderer>().sharedMaterial = MakeGlassMaterial(pose.piece, glass.GetColor("_Color"), "_Kopfglas", true, GlassTint);
 
             // Pose in einer Vorschau-Szene backen
             var scene = EditorSceneManager.NewPreviewScene();
@@ -168,21 +180,31 @@ public static class DummyTetrominoBuilder
         }
     }
 
-    // Glaskasten-Material (wie der Kopfkasten) in der Farbe des Steins; 'source' = bisheriges Blockmaterial.
-    // Ist 'source' schon ein Glasmaterial dieses Tools (beim Neubau), bleibt dessen Farbe erhalten.
-    static Material MakeGlassMaterial(string piece, Material source)
+    // Glaskasten-Material in der Farbe des Steins: Kanten in Steinfarbe, Scheiben leicht getönt.
+    // 'color' = Farbe des bisherigen Blockmaterials. Gibt es das Material schon (Neubau), bleibt dessen Farbe erhalten,
+    // die Glas-Einstellungen werden aber jedes Mal neu gesetzt. frontClear = Scheibe zur Kamera ungetönt (Kopfkasten).
+    static Material MakeGlassMaterial(string piece, Color color, string suffix, bool frontClear, float tint)
     {
         Directory.CreateDirectory(MeshDir);
-        string path = MeshDir + "/" + piece + "_Glas.mat";
-        var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
-        if (existing != null) return existing;
-
-        var glass = new Material(AssetDatabase.LoadAssetAtPath<Material>("Assets/Material/Glaskasten Bevel.mat"));
-        glass.name = piece + "_Glas";
-        Color c = source.GetColor("_Color");
-        glass.SetColor("_Color", c);
-        glass.SetFloat("_BevelAlpha", 0.9f);
-        AssetDatabase.CreateAsset(glass, path);
+        string path = MeshDir + "/" + piece + suffix + ".mat";
+        var glass = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (glass == null)
+        {
+            glass = new Material(AssetDatabase.LoadAssetAtPath<Material>("Assets/Material/Glaskasten Bevel.mat"));
+            glass.name = piece + suffix;
+            glass.SetColor("_Color", color);
+            AssetDatabase.CreateAsset(glass, path);
+        }
+        glass.SetFloat("_FaceAlpha", tint);
+        glass.SetFloat("_BevelAlpha", EdgeAlpha);
+        glass.SetFloat("_Highlight", EdgeHighlight);
+        glass.SetFloat("_Darken", EdgeDarken);
+        glass.SetFloat("_FrontClear", frontClear ? 1f : 0f);
+        glass.SetFloat("_SrcBlend", 5f);   // SrcAlpha
+        glass.SetFloat("_DstBlend", 10f);  // OneMinusSrcAlpha
+        glass.SetFloat("_ZWrite", 0f);
+        glass.renderQueue = 3000;
+        EditorUtility.SetDirty(glass);
         return glass;
     }
 

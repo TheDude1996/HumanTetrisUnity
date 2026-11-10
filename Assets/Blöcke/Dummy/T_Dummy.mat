@@ -27,9 +27,12 @@ Material:
     m_Floats:
     - _BevelAlpha: 1
     - _BevelShade: 1.2
+    - _Darken: 0.8
     - _DstBlend: 0
     - _FaceAlpha: 1
     - _FaceShade: 1.2
+    - _FrontClear: 0
+    - _Highlight: 0.6
     - _SrcBlend: 1
     - _ZWrite: 1
     m_Colors:

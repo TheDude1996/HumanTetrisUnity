@@ -61,17 +61,20 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BevelAlpha: 0.9
+    - _BevelAlpha: 0.95
     - _BevelShade: 1.6
     - _BumpScale: 1
     - _Cutoff: 0.5
+    - _Darken: 0.35
     - _DetailNormalMapScale: 1
     - _DstBlend: 10
-    - _FaceAlpha: 0
+    - _FaceAlpha: 0.1
     - _FaceShade: 1
+    - _FrontClear: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.746
     - _GlossyReflections: 1
+    - _Highlight: 0.2
     - _Metallic: 0.145
     - _Mode: 3
     - _OcclusionStrength: 1
