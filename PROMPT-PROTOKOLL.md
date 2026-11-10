@@ -162,29 +162,42 @@ Die Prompts dieses Tages sind nicht erhalten. Umgesetzt wurde laut Commits auf `
 
 **Umsetzung:** Dieses Protokoll angelegt und `CLAUDE.md` aktualisiert (Verweis hierauf, aktueller Stand, Kopf-Größen).
 
-## 10.11.2026 — Farbige Glaskästen
+## 10.11.2026 — Glaskästen, Hauptmenü und Dummy-Posen
+
+Drei Chats im Projektordner: der Hauptchat („Claude zum PATH hinzufügen“, gibt Aufträge an einen Neben-Chat weiter), ein Chat zum Startfehler des MCP-Servers und der Neben-Chat, in dem die Umsetzung lief.
 
 ### 25. Kanten und Glas in Steinfarbe, klarer Kopfkasten
 
-**Prompt:** (Screenshot der Tetromino-Prefabs, Auftrag aus einer anderen Claude-Session) Alle Kanten der Glaskästen in der Farbe des Steins, Glas durchsichtig, aber in Steinfarbe getönt; am Kopfkasten (`Glascube`) und beim großen Kopf im O-Stein bleibt die Vorderscheibe farblos. Ghost-Prefabs nicht verändern.
+**Prompt:** (Screenshot der Tetromino-Prefabs) „wir wollen die glaskästen weiterentwickeln alle kanten an den terominos sollenb in block farbe sein, dessweiteren möchten wir die glas kästen durchsichtig in ihrer jewiligen farbe einfärben am kopf block soll die vordere scheibe durchsichtig bleiben damit man die köpfe klar erennen kann“
 
-**Umsetzung:** Shader `BevelBlock` um `_Highlight`/`_Darken` (wie stark Kanten Richtung Weiß/Schwarz schattiert werden) und `_FrontClear` (Scheibe zur Kamera durchsichtig) erweitert; Standardwerte lassen alle anderen Materialien unverändert. `DummyTetrominoBuilder` setzt Tönung und Kanten jetzt bei jedem Neubau und legt pro Stein ein `<Stein>_Kopfglas.mat` für den Kopfkasten an (O-Stein: alle vier Zellen). Alle 7 Prefabs neu gebaut, Kontrolle über die Vorschaubilder in `Temp/DummyPreviews`. Da der Unity-MCP-Server nicht erreichbar war, lief der Neubau über ein temporäres Editor-Skript (danach wieder gelöscht). Noch nicht committet.
+**Umsetzung:** Shader `BevelBlock` um `_Highlight`/`_Darken` (wie stark Kanten Richtung Weiß/Schwarz schattiert werden) und `_FrontClear` (Scheibe zur Kamera durchsichtig) erweitert; Standardwerte lassen alle anderen Materialien unverändert. `DummyTetrominoBuilder` setzt Tönung und Kanten jetzt bei jedem Neubau und legt pro Stein ein `<Stein>_Kopfglas.mat` für den Kopfkasten an (O-Stein: alle vier Zellen). Ghost-Prefabs unverändert. Alle 7 Prefabs neu gebaut, Kontrolle über die Vorschaubilder in `Temp/DummyPreviews`. Da der Unity-MCP-Server nicht erreichbar war, lief der Neubau über ein temporäres Editor-Skript (danach wieder gelöscht). Später als `fdad2de` committet.
 
-### 26. Commits, MCP-Verbindung und Haufen nur mit Spieler 1–4
+### 26. MCP-Server startet nicht (PyYAML)
 
-**Prompts:** „Erst im Spiel testen“ / „verbinde den mcp server neu“ / „Ja, committen“ / „comitte auch diese manuellen änderungen“ / „im haupt menu sollen nur die modelle 1-4 angezeigt werden“
+**Prompt:** Eingefügte Fehlermeldung beim Start des MCP-for-Unity-Servers über `uvx` („error: Failed to build `pyyaml==6.0.3`“ …)
 
-**Umsetzung:** Unity hatte sich nicht beim MCP-Server angemeldet; die Bridge über ein temporäres Editor-Skript neu gestartet. Glaskästen im Play-Mode geprüft (Menü und Spiel), Commit `fdad2de` gepusht. Manuelle Änderungen (Level alle 4 Linien, schnellere Fallzeiten, Spawner y = 68, Scans `Playermodell_0005`/`0006`, neue `kinect_sample.wav`) als `c17481c` committet und gepusht. `MenuTetrominoPile` zeigt im Haufen nur noch die Köpfe der Spieler 1–4 (`minPlayerNumber`/`maxPlayerNumber`); die Spielerauswahl enthält weiter alle Spieler.
+**Umsetzung:** Ursache erklärt: `uvx` nimmt das System-Python 3.15, für das es noch keine fertigen PyYAML-Pakete gibt, und zum Kompilieren fehlt der C++-Compiler. Lösung: `uvx` mit `--python 3.12` starten (auch in der MCP-Konfiguration) oder `UV_PYTHON=3.12` setzen.
 
-### 27. Steine im Hauptmenü: großer Kopf im O, kein Dummy kopfüber
+### 27. Spieltest, MCP-Verbindung, Commits und Haufen nur mit Spieler 1–4
+
+**Prompts:** „Erst im Spiel testen“ / „verbinde den mcp server neu“ / „Ja, committen“ / „Ja, pushen“ / „comitte auch diese manuellen änderungen“ / „Ja, pushen“ / „im haupt menu sollen nur die modelle 1-4 angezeigt werden“ / „Ja, beides“
+
+**Umsetzung:** Der MCP-Server lief, aber Unity hatte sich nicht angemeldet; die Bridge über ein temporäres Editor-Skript neu gestartet. Glaskästen im Play-Mode geprüft (Menü und Spiel), Commit `fdad2de` gepusht. Manuelle Änderungen (Level alle 4 Linien, schnellere Fallzeiten, Spawner y = 68, Scans `Playermodell_0005`/`0006`, neue `kinect_sample.wav`) als `c17481c` committet und gepusht. `MenuTetrominoPile` zeigt im Haufen nur noch die Köpfe der Spieler 1–4 (`minPlayerNumber`/`maxPlayerNumber`); die Spielerauswahl enthält weiter alle Spieler (`e52ee61`, gepusht).
+
+### 28. Steine im Hauptmenü: großer Kopf im O, kein Dummy kopfüber
 
 **Prompt:** (Screenshots eines O- und eines L-Steins aus dem Menü-Haufen) „diese steine im hauptmenu musst du nochmal anschauen“
 
-**Umsetzung:** Im Haufen fehlte beim O-Stein der große Kopf (die Skripte, auch `BigHeadBlock`, werden dort entfernt), und die Köpfe standen immer aufrecht, auch wenn der Dummy durch die Drehung kopfüber stand. Jetzt: O-Stein mit großem Kopf über alle vier Zellen (`PlayerDataManager.CreateBigHead`), Köpfe drehen mit dem Stein und folgen der Pose (`tiltZ`), und Drehungen mit kopfüber stehendem Dummy werden beim Aufbau des Haufens ausgelassen.
+**Umsetzung:** Im Haufen fehlte beim O-Stein der große Kopf (die Skripte, auch `BigHeadBlock`, werden dort entfernt), und die Köpfe standen immer aufrecht, auch wenn der Dummy durch die Drehung kopfüber stand. Jetzt: O-Stein mit großem Kopf über alle vier Zellen (`PlayerDataManager.CreateBigHead`), Köpfe drehen mit dem Stein und folgen der Pose (`tiltZ`), und Drehungen mit kopfüber stehendem Dummy werden beim Aufbau des Haufens ausgelassen (`bdaa407`).
 
-### 28. Dummy ragt aus den Glaskästen
+### 29. Dummy ragt aus den Glaskästen
 
-**Prompt:** (Auftrag aus einer anderen Claude-Session, mit Screenshot eines blauen J-Steins) Bei manchen Steinen ragt der Dummy-Körper aus den Glaskästen; betroffene Steine finden und die Posen anpassen.
+**Prompt:** (Screenshot eines blauen J-Steins) „bei manchen blöcken sind die körper nicht ganz im block drin wie zum beispiel auf dem screenshot finde heraus welche blöcke es betrifft und passe sie an“
 
-**Umsetzung:** Neues Prüfwerkzeug `Tools/Dummy in Tetrominos/Check bounds` (`DummyTetrominoBuilder.CheckBounds`): prüft alle Vertices der `DummyPart`-Meshes gegen die Zellen des Steins. Betroffen waren 6 von 7 Steinen (O hat keinen Dummy): J/L Füße 1,4 Einheiten seitlich hinaus und Zehen 1,0 nach vorne, I Schultern/Arme 0,35 zu breit, S/Z/T Füße bzw. Knie bis 0,9 nach vorne und Becken 0,45 unter der Zelle. Angepasst: I Arme gerade nach unten; J/L Dummy kleiner (k 6,5), Knie angewinkelt, Arm steiler in die obere Zelle; S/Z k 6,2, Beine gestreckt mit Zehen nach oben; T k 6,2, Arme leicht gesenkt, Schneidersitz flacher, Füße seitlich. Neue Pose-Felder `footA`/`footB` (Zehenrichtung). Alle Prefabs neu gebaut, Prüfung meldet keinen Überstand mehr, Vorschaubilder kontrolliert.
+**Umsetzung:** Neues Prüfwerkzeug `Tools/Dummy in Tetrominos/Check bounds` (`DummyTetrominoBuilder.CheckBounds`): prüft alle Vertices der `DummyPart`-Meshes gegen die Zellen des Steins. Betroffen waren 6 von 7 Steinen (O hat keinen Dummy): J/L Füße 1,4 Einheiten seitlich hinaus und Zehen 1,0 nach vorne, I Schultern/Arme 0,35 zu breit, S/Z/T Füße bzw. Knie bis 0,9 nach vorne und Becken 0,45 unter der Zelle. Angepasst: I Arme gerade nach unten; J/L Dummy kleiner (k 6,5), Knie angewinkelt, Arm steiler in die obere Zelle; S/Z k 6,2, Beine gestreckt mit Zehen nach oben; T k 6,2, Arme leicht gesenkt, Schneidersitz flacher, Füße seitlich. Neue Pose-Felder `footA`/`footB` (Zehenrichtung). Alle Prefabs neu gebaut, Prüfung meldet keinen Überstand mehr, Vorschaubilder kontrolliert (`0e744aa`).
 
+### 30. Abschluss: Szene, Commits, Protokoll
+
+**Prompts:** „Nein, so lassen“ (ein beim Testen in `Tetris.unity` mitgespeichertes Objekt `HeadTemplate Playermodell_0006` nicht zurücksetzen) / „commite“ / „Ja, pushen“ / „sind alle promps von heute im protokoll“
+
+**Umsetzung:** `bdaa407` und `0e744aa` committet und gepusht; `Tetris.unity` zeigte danach ohnehin keine Änderung mehr. Protokoll für den 10.11. vervollständigt (Originalwortlaut der Aufträge aus dem Hauptchat, Chat zum PyYAML-Fehler, diese Schlussrunde).
