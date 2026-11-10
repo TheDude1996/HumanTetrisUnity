@@ -32,6 +32,9 @@ public class MenuTetrominoPile : MonoBehaviour
     {
         public Transform box;                 // der Glaskasten
         public GameObject head;               // aktueller Kopf darin
+        public Transform root;                // der ganze Stein
+        public float tilt;                    // Kopfneigung (CollisionBlock.tiltZ), passend zur Dummy-Pose
+        public bool big;                      // O-Stein: ein großer Kopf über alle vier Zellen (BigHeadBlock)
     }
 
     private readonly List<Piece> pieces = new List<Piece>();
@@ -96,6 +99,9 @@ public class MenuTetrominoPile : MonoBehaviour
             GameObject prefab = tetrominoPrefabs[rng.Next(tetrominoPrefabs.Length)];
             Vector2Int[] cells = ReadCells(prefab);
             if (cells.Length == 0) continue;
+            var socket = prefab.GetComponentInChildren<CollisionBlock>(true);
+            float tilt = socket != null ? socket.tiltZ : 0f;
+            bool big = prefab.GetComponent<BigHeadBlock>() != null;
 
             if (loose)
             {
@@ -103,6 +109,7 @@ public class MenuTetrominoPile : MonoBehaviour
                 for (int attempt = 0; attempt < 40; attempt++)
                 {
                     int rot = rng.Next(4);
+                    if (!Upright(rot, tilt, big)) continue;
                     Vector2Int[] r = Rotate(cells, rot, out int minX, out int minY, out int w, out int h);
                     int x0 = rng.Next(0, Mathf.Max(1, columns - w + 1));
                     if (x0 + w > columns) continue;
@@ -111,7 +118,7 @@ public class MenuTetrominoPile : MonoBehaviour
                     foreach (var c in r) y0 = Mathf.Max(y0, height[x0 + c.x] - c.y);
                     if (y0 + h > maxRows) continue;
 
-                    Spawn(holder.transform, prefab, new Vector2Int(x0 - minX, y0 - minY), rot);
+                    Spawn(holder.transform, prefab, new Vector2Int(x0 - minX, y0 - minY), rot, tilt, big);
                     foreach (var c in r) height[x0 + c.x] = Mathf.Max(height[x0 + c.x], y0 + c.y + 1);
                     filled += cells.Length;
                     break;
@@ -126,6 +133,7 @@ public class MenuTetrominoPile : MonoBehaviour
 
             for (int rot = 0; rot < 4; rot++)
             {
+                if (!Upright(rot, tilt, big)) continue;
                 Vector2Int[] r = Rotate(cells, rot, out int minX, out int minY, out int w, out int h);
                 for (int x0 = 0; x0 + w <= columns; x0++)
                 {
@@ -155,7 +163,7 @@ public class MenuTetrominoPile : MonoBehaviour
             if (bestCells == null) break; // nichts passt mehr
 
             // Position der Prefab-Wurzel im Raster
-            Spawn(holder.transform, prefab, new Vector2Int(bestX - bestMinX, bestY - bestMinY), bestRot);
+            Spawn(holder.transform, prefab, new Vector2Int(bestX - bestMinX, bestY - bestMinY), bestRot, tilt, big);
             foreach (var c in bestCells) height[bestX + c.x] = Mathf.Max(height[bestX + c.x], bestY + c.y + 1);
             filled += cells.Length;
         }
@@ -198,7 +206,15 @@ public class MenuTetrominoPile : MonoBehaviour
         return r;
     }
 
-    void Spawn(Transform holder, GameObject prefab, Vector2Int root, int rot)
+    // Der Dummy darf nicht kopfüber stehen: Die Kopf-Richtung (Pose-Neigung + Drehung des Steins) zeigt nicht nach unten.
+    // Stehend oder liegend ist erlaubt; der Kopf dreht dann mit dem Körper (wie im Spiel).
+    static bool Upright(int rot, float tilt, bool big)
+    {
+        if (big) return true;
+        return Mathf.Cos((90f * rot + tilt) * Mathf.Deg2Rad) > -0.01f;
+    }
+
+    void Spawn(Transform holder, GameObject prefab, Vector2Int root, int rot, float tilt, bool big)
     {
         GameObject go = Instantiate(prefab, holder);
         go.name = prefab.name;
@@ -213,7 +229,7 @@ public class MenuTetrominoPile : MonoBehaviour
         go.transform.localScale = Vector3.one;
 
         Transform box = go.transform.Find("Glascube");
-        if (box != null) pieces.Add(new Piece { box = box });
+        if (box != null) pieces.Add(new Piece { box = box, root = go.transform, tilt = tilt, big = big });
     }
 
     // ---------------- Köpfe ----------------
@@ -318,13 +334,34 @@ public class MenuTetrominoPile : MonoBehaviour
             if (heads.Count > 0)
             {
                 var asset = heads[order[i]];
-                // aufrecht und zur Kamera: Basisdrehung = keine (im Spiel dreht der Kopf mit dem Stein)
-                p.head = data.CreateHead(asset.Template, asset.Player, p.box, p.box.position, Quaternion.identity, p.box.lossyScale.x);
+                if (p.big)
+                {
+                    // O-Stein: großer Kopf über alle vier Zellen, aufrecht zur Kamera
+                    p.head = data.CreateBigHead(asset.Template, asset.Player, p.root, CellsCenter(p.root));
+                }
+                else
+                {
+                    // Kopf dreht mit dem Stein und folgt der Pose (wie CollisionBlock im Spiel)
+                    p.head = data.CreateHead(asset.Template, asset.Player, p.box, p.box.position, p.box.rotation * Quaternion.Euler(0f, 0f, p.tilt), p.box.lossyScale.x);
+                }
             }
             else if (fallback != null)
             {
-                p.head = Instantiate(fallback, p.box.position, Quaternion.identity, p.box);
+                p.head = Instantiate(fallback, p.box.position, p.box.rotation * Quaternion.Euler(0f, 0f, p.tilt), p.box);
             }
         }
+    }
+
+    // Mitte aller Zellen eines Steins (Weltkoordinaten)
+    static Vector3 CellsCenter(Transform root)
+    {
+        Vector3 sum = Vector3.zero;
+        int n = 0;
+        foreach (Transform c in root)
+        {
+            if (c.GetComponent<MeshRenderer>() == null) continue;
+            sum += c.position; n++;
+        }
+        return n > 0 ? sum / n : root.position;
     }
 }

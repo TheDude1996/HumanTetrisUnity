@@ -430,6 +430,36 @@ public class PlayerDataManager : MonoBehaviour
         quadrantMeshes.Clear();
     }
 
+    // Großer Kopf am Stück (wie beim O-Stein, aber nicht in Viertel geschnitten), z.B. für den O-Stein im Hauptmenü:
+    // Breite/Höhe = BigHeadSize, Tiefe auf BigHeadDepth gestaucht, aufrecht zur Kamera, Mitte in 'center'.
+    public GameObject CreateBigHead(GameObject template, string player, Transform parent, Vector3 center)
+    {
+        if (template == null) return null;
+
+        var root = new GameObject("BigHead " + player);
+        root.transform.SetParent(parent, false);
+        root.transform.position = center;
+        root.transform.rotation = Quaternion.identity;
+
+        GameObject copy = Instantiate(template, root.transform);
+        copy.transform.localPosition = Vector3.zero;
+        copy.transform.rotation = Quaternion.Euler(config.headRotation);
+        copy.transform.localScale = Vector3.one;
+        copy.SetActive(true);
+
+        var renderers = copy.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0) return root;
+        Bounds b = renderers[0].bounds;
+        foreach (var rd in renderers) b.Encapsulate(rd.bounds);
+        float largestXY = Mathf.Max(b.size.x, b.size.y);
+        if (largestXY > 0) copy.transform.localScale *= BigHeadSize / largestXY;
+        b = renderers[0].bounds;
+        foreach (var rd in renderers) b.Encapsulate(rd.bounds);
+        copy.transform.position += center - b.center;
+        if (b.size.z > BigHeadDepth) root.transform.localScale = new Vector3(1f, 1f, BigHeadDepth / b.size.z); // um die Mitte gestaucht
+        return root;
+    }
+
     private void BuildHeadQuadrants()
     {
         DestroyHeadQuadrants();
