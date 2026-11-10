@@ -170,3 +170,9 @@ Die Prompts dieses Tages sind nicht erhalten. Umgesetzt wurde laut Commits auf `
 
 **Umsetzung:** Shader `BevelBlock` um `_Highlight`/`_Darken` (wie stark Kanten Richtung Weiß/Schwarz schattiert werden) und `_FrontClear` (Scheibe zur Kamera durchsichtig) erweitert; Standardwerte lassen alle anderen Materialien unverändert. `DummyTetrominoBuilder` setzt Tönung und Kanten jetzt bei jedem Neubau und legt pro Stein ein `<Stein>_Kopfglas.mat` für den Kopfkasten an (O-Stein: alle vier Zellen). Alle 7 Prefabs neu gebaut, Kontrolle über die Vorschaubilder in `Temp/DummyPreviews`. Da der Unity-MCP-Server nicht erreichbar war, lief der Neubau über ein temporäres Editor-Skript (danach wieder gelöscht). Noch nicht committet.
 
+### 26. Commits, MCP-Verbindung und Haufen nur mit Spieler 1–4
+
+**Prompts:** „Erst im Spiel testen“ / „verbinde den mcp server neu“ / „Ja, committen“ / „comitte auch diese manuellen änderungen“ / „im haupt menu sollen nur die modelle 1-4 angezeigt werden“
+
+**Umsetzung:** Unity hatte sich nicht beim MCP-Server angemeldet; die Bridge über ein temporäres Editor-Skript neu gestartet. Glaskästen im Play-Mode geprüft (Menü und Spiel), Commit `fdad2de` gepusht. Manuelle Änderungen (Level alle 4 Linien, schnellere Fallzeiten, Spawner y = 68, Scans `Playermodell_0005`/`0006`, neue `kinect_sample.wav`) als `c17481c` committet und gepusht. `MenuTetrominoPile` zeigt im Haufen nur noch die Köpfe der Spieler 1–4 (`minPlayerNumber`/`maxPlayerNumber`); die Spielerauswahl enthält weiter alle Spieler.
+

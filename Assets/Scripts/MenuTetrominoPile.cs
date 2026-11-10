@@ -23,6 +23,10 @@ public class MenuTetrominoPile : MonoBehaviour
     public bool loose = true;
     [Tooltip("Wenn kein Kopf-Scan geladen werden kann: Standardkopf aus Resources")]
     public string fallbackHead = "Blocks/PlayerHead";
+    [Tooltip("Nur Köpfe der Spieler mit dieser Nummer (Ordnername endet auf die Zahl, z. B. Playermodell_0001) im Haufen zeigen")]
+    public int minPlayerNumber = 1;
+    [Tooltip("Höchste Spielernummer im Haufen (0 = alle)")]
+    public int maxPlayerNumber = 4;
 
     private class Piece
     {
@@ -218,14 +222,22 @@ public class MenuTetrominoPile : MonoBehaviour
     {
         var data = PlayerDataManager.Instance;
 
+        // Nur die gewählten Spielernummern (Spielerauswahl im Menü bleibt davon unberührt)
+        var players = new List<string>();
+        foreach (string player in data.Players)
+        {
+            long n = PlayerDataManager.GetPlayerNumber(player);
+            if (n >= minPlayerNumber && (maxPlayerNumber <= 0 || n <= maxPlayerNumber)) players.Add(player);
+        }
+
         // Ohne Scans: Standardkopf in alle Kästen
-        if (data.Players.Count == 0)
+        if (players.Count == 0)
         {
             ApplyHeads();
             return;
         }
 
-        foreach (string player in data.Players)
+        foreach (string player in players)
         {
             var asset = await data.LoadHeadAssetAsync(player);
             if (this == null) { asset?.Dispose(); return; } // Szene wurde inzwischen verlassen
