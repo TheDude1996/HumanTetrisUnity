@@ -1,3 +1,4 @@
+using System.Data;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -109,9 +110,14 @@ public class GameManager : MonoBehaviour
         if (gameOver) return; // nur einmal pro Runde speichern
         gameOver = true;
 
+        Destroy(Camera.main.gameObject, 0.3f);
+
+
         // Runde im Ordner des Spielers und in der globalen Bestenliste sichern (Netzwerk, im Hintergrund)
         LastScore = score; LastLevel = level; LastLines = totalLines;
         PlayerDataManager.Instance.SaveRound(score, level, totalLines);
+
+
 
         SceneManager.LoadScene(2);
     }
