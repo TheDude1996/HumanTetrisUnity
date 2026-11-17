@@ -201,3 +201,35 @@ Drei Chats im Projektordner: der Hauptchat („Claude zum PATH hinzufügen“, g
 **Prompts:** „Nein, so lassen“ (ein beim Testen in `Tetris.unity` mitgespeichertes Objekt `HeadTemplate Playermodell_0006` nicht zurücksetzen) / „commite“ / „Ja, pushen“ / „sind alle promps von heute im protokoll“
 
 **Umsetzung:** `bdaa407` und `0e744aa` committet und gepusht; `Tetris.unity` zeigte danach ohnehin keine Änderung mehr. Protokoll für den 10.11. vervollständigt (Originalwortlaut der Aufträge aus dem Hauptchat, Chat zum PyYAML-Fehler, diese Schlussrunde).
+
+## 17.11.2026 — Weiße Linie im Game-Fenster, Bestenliste im Hauptmenü
+
+### 31. Weiße Linie durch das Spielfeld
+
+**Prompt:** (Screenshot des Game-Fensters) „woher kommt diese weiße linien die durch das spielfeld geht und wie bekommen wir sie weg“
+
+**Umsetzung:** Keine Änderung. Die Linie (1 Pixel, halb durchsichtig, über allem, von der linken unteren Spielfeldecke nach oben und rechts) ist sehr wahrscheinlich ein Editor-Gizmo; im Game-Fenster war „Gizmos“ eingeschaltet. In der Szene fand sich kein Objekt, das sie zeichnet. Lösung: Gizmos im Game-Fenster ausschalten; im Build erscheinen sie ohnehin nicht.
+
+### 32. Top 5 der Bestenliste im Hauptmenü
+
+**Prompt:** „wie haben eine highscore JSON datei mit "Score" Werten. Wir möchten die Top 5 höchsten scores als tabelle im hauptmenü in unity abbilden die datei mit den werten heißt "leaderboard.json". es soll immer nur der beste score von einem spieler sein (wenn ein spieler zwei scores in der top 5 hat soll nur der bessere angezeigt werden)“
+
+**Umsetzung:** `PlayerDataManager.GetTopScores(count)` liest `leaderboard.json`, nimmt pro Spieler nur die beste Runde (alle Modi zusammen) und sortiert absteigend. Neues Skript `LeaderboardTable.cs` schreibt die Tabelle (Platz, Spieler, Score, Modus; gewählter Spieler in Lime) in einen TMP-Text; `MainMenu` liest sie bei REFRESH und beim Spielerwechsel neu ein. Die Karte `LeaderboardCard` (Kopie der `PlayerCard`, links am Bildrand) baut `Tools/Leaderboard/Add to Main Menu` (`Assets/Editor/LeaderboardSetup.cs`) in die Szene, da der Unity-MCP-Server nicht erreichbar war.
+
+### 33. Bestenliste nach links, getrennt nach Kinect und Tastatur
+
+**Prompt:** (Screenshot des Hauptmenüs mit eingezeichnetem Pfeil nach links) „leaderboard soll nach links verschoben werden (wie in screenshot)und wir wollen zwei getrennte leaderboard für kinect und keyboard.“
+
+**Umsetzung:** Die erste Karte landete in der Mitte, weil sie am 100 × 100 großen `MainMenu`-Objekt statt am Bildrand verankert war, und der Text war zu groß. Jetzt zwei Karten `LeaderboardKinect` und `LeaderboardKeyboard` übereinander links neben dem Titel (x = -735, 350 × 320), Schrift 28, ohne Spalte MODE. `GetTopScores(count, mode)` filtert nach Modus (alte Runden ohne Modus = Tastatur).
+
+### 34. Bestenlisten weiter links, Überschriften ohne Nummer
+
+**Prompt:** „noch weiter nach links damit man den ganzen titel "human tetris" sieht außerdem entferne bei main menu die nummerierung bei 01 / Spieler soll nur Spieler heißen 02 / Top 5 kinect soll nur top 5 kinect und 03 / top 5 keyboard nur top 5 keyboard“
+
+**Umsetzung:** Karten auf x = -770 und 320 breit (rechte Kante -610, der Titel beginnt bei -565). Überschriften „TOP 5 KINECT“, „TOP 5 KEYBOARD“ und „SPIELER“ (statt „01 / SPIELER“); `LeaderboardSetup` setzt alle drei.
+
+### 35. Bestenlisten an den linken Bildrand
+
+**Prompt:** (Screenshot: Karte verdeckt das „H“ im Titel) „man sieht das "H" in dem titel immer noch nicht. verschieben die beiden tabellen noch weiter nach links“
+
+**Umsetzung:** Die Rechnung davor ging von 16:9 aus, das Game-Fenster war aber breiter, und der Titel beginnt bei x = -682 (nicht -565). Die Karten hängen jetzt am linken Bildrand (16 Einheiten Abstand, 256 × 280, Schrift 24), dafür ist `MainMenu` auf den ganzen Canvas gezogen (die übrigen Kinder sind mittig verankert und bleiben an ihrem Platz).

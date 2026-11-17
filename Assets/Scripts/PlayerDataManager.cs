@@ -717,6 +717,23 @@ public class PlayerDataManager : MonoBehaviour
         return ReadJson<Leaderboard>(Path.Combine(ScansRoot, LeaderboardFileName));
     }
 
+    // Die besten Runden eines Modus ("kinect"/"keyboard") aus der globalen Bestenliste, pro Spieler nur seine beste.
+    // Alte Runden ohne Modus zählen wie bei GetBest als Tastatur.
+    public List<Round> GetTopScores(int count, string mode)
+    {
+        var board = GetLeaderboard();
+        if (board == null || board.entries == null) return new List<Round>();
+
+        return board.entries
+            .Where(e => e != null && !string.IsNullOrEmpty(e.player))
+            .Where(e => (string.IsNullOrEmpty(e.mode) ? GameSettings.KeyboardId : e.mode) == mode)
+            .GroupBy(e => e.player)
+            .Select(g => g.OrderByDescending(e => e.score).First())
+            .OrderByDescending(e => e.score)
+            .Take(count)
+            .ToList();
+    }
+
     // ---------------- Hilfsfunktionen ----------------
 
     private static T ReadJson<T>(string path) where T : class

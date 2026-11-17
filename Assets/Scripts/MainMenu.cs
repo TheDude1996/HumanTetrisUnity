@@ -77,12 +77,21 @@ public class MainMenu : MonoBehaviour {
     {
         PlayerDataManager.Instance.SelectRelative(1);
         UpdatePlayerLabel();
+        RefreshLeaderboard();
     }
 
     public void PreviousPlayer()
     {
         PlayerDataManager.Instance.SelectRelative(-1);
         UpdatePlayerLabel();
+        RefreshLeaderboard();
+    }
+
+    // Bestenlisten (Kinect und Tastatur) neu einlesen (hebt außerdem den gewählten Spieler hervor)
+    void RefreshLeaderboard()
+    {
+        foreach (var leaderboard in FindObjectsByType<LeaderboardTable>(FindObjectsSortMode.None))
+            leaderboard.Refresh();
     }
 
     // Konfiguration und Ordnerliste neu einlesen (z.B. nachdem die Pipeline einen neuen Spieler angelegt hat).
@@ -98,6 +107,7 @@ public class MainMenu : MonoBehaviour {
             data.SelectPlayer(data.Players[data.Players.Count - 1]);
 
         UpdatePlayerLabel();
+        RefreshLeaderboard();
     }
 
     void UpdatePlayerLabel()
